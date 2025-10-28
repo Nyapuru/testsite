@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Няпуру — Фан-сайт</title>
+  <meta name="description" content="Фан-сайт Няпуру — антропоморфного пингвина-стримера. Галерея, комиксы, расписание стримов и ссылки.">
+  <style>
+    :root{--bg:#0f1724;--card:#0b1220;--muted:#9aa4b2;--accent:#c03b3b;--glass:rgba(255,255,255,0.04)}
+    *{box-sizing:border-box}
+    body{font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial; margin:0; background:linear-gradient(180deg,#071028 0%,var(--bg) 100%); color:#e6eef6; -webkit-font-smoothing:antialiased}
+    header{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;background:linear-gradient(90deg,rgba(255,255,255,0.02),transparent);backdrop-filter: blur(6px)}
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(180deg,#111827,#0b1220);display:grid;place-items:center;border:2px solid rgba(255,255,255,0.04)}
+    .logo svg{width:44px;height:44px}
+    nav{display:flex;gap:18px;align-items:center}
+    a.navlink{color:var(--muted);text-decoration:none;font-weight:600}
+    a.navlink:hover{color:#fff}
+    .cta{background:linear-gradient(90deg,#ef6b6b,#b83b3b);padding:8px 12px;border-radius:10px;color:white;text-decoration:none;font-weight:700}
+
+    main{max-width:1100px;margin:28px auto;padding:22px}
+    .grid{display:grid;gap:18px}
+    .hero{display:flex;gap:18px;align-items:center;padding:18px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border-radius:14px}
+    .avatar{width:160px;height:160px;border-radius:14px;background:linear-gradient(180deg,#111827,#0b1220);display:grid;place-items:center;border:2px solid rgba(255,255,255,0.04)}
+    .avatar svg{width:140px;height:140px}
+    .hcontent{flex:1}
+    h1{margin:0;font-size:26px}
+    p.lead{margin:8px 0;color:var(--muted)}
+
+    .cards{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+    .card{background:var(--card);padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+    .card h3{margin:0 0 8px 0}
+    .muted{color:var(--muted);font-size:14px}
+
+    .gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .thumb{padding:8px;background:var(--glass);border-radius:10px;display:block;text-decoration:none}
+    .thumb .svgwrap{height:120px;border-radius:8px;display:grid;place-items:center;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent)}
+
+    footer{max-width:1100px;margin:22px auto;padding:18px;text-align:center;color:var(--muted)}
+
+    /* modal */
+    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(2,6,23,0.6)}
+    .modal .panel{background:#061021;padding:18px;border-radius:12px;max-width:900px;width:94%}
+
+    /* responsive */
+    @media (max-width:900px){.cards{grid-template-columns:1fr}.gallery{grid-template-columns:repeat(2,1fr)}.hero{flex-direction:column;align-items:flex-start}.avatar{width:120px;height:120px}.logo{width:48px;height:48px}}
+    @media (max-width:560px){.gallery{grid-template-columns:1fr}}
+
+    /* mobile nav */
+    .mobile-toggle{display:none}
+    @media (max-width:700px){nav{display:none}.mobile-toggle{display:inline-flex}}
+
+    /* small helper */
+    .pill{display:inline-block;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.03);font-weight:700}
+    .center{display:flex;gap:10px;align-items:center}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo" aria-hidden>
+        <!-- simple penguin-ish emblem (SVG) -->
+        <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+          <rect width="64" height="64" rx="12" fill="#0b1220"/>
+          <g transform="translate(10,8)">
+            <ellipse cx="22" cy="26" rx="12" ry="14" fill="#111827" />
+            <ellipse cx="22" cy="22" rx="8" ry="10" fill="#fff" />
+            <path d="M18 14c1-3 8-3 9 0" stroke="#c33b3b" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="18" cy="22" r="1.8" fill="#000"/>
+            <circle cx="26" cy="22" r="1.8" fill="#000"/>
+          </g>
+        </svg>
+      </div>
+      <div>
+        <div style="font-weight:800">Няпуру</div>
+        <div style="font-size:12px;color:var(--muted)">Fan site — антропоморфный пингвин-стример</div>
+      </div>
+    </div>
+
+    <nav aria-label="Главное меню">
+      <a class="navlink" href="#about">О Няпуру</a>
+      <a class="navlink" href="#gallery">Галерея</a>
+      <a class="navlink" href="#comics">Комиксы</a>
+      <a class="navlink" href="#streams">Стримы</a>
+      <a class="cta" href="#contacts">Связаться</a>
+    </nav>
+
+    <button class="mobile-toggle" id="menuBtn" aria-label="Открыть меню">☰</button>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="avatar" aria-hidden>
+        <!-- big SVG avatar placeholder -->
+        <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" role="img">
+          <rect width="120" height="120" rx="12" fill="#0b1220"/>
+          <g transform="translate(10,8)">
+            <ellipse cx="50" cy="58" rx="36" ry="44" fill="#111827" />
+            <ellipse cx="50" cy="46" rx="22" ry="30" fill="#fff" />
+            <path d="M38 28c2-4 16-4 18 0" stroke="#8b1f1f" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="42" cy="46" r="4" fill="#000"/>
+            <circle cx="58" cy="46" r="4" fill="#000"/>
+            <path d="M46 66c6 6 14 6 20 0" stroke="#ff9f62" stroke-width="6" stroke-linecap="round"/>
+          </g>
+        </svg>
+      </div>
+
+      <div class="hcontent">
+        <h1>Няпуру — антропоморфный пингвин</h1>
+        <p class="lead">Привет! Это фан-сайт Няпуру — твоё место для арта, комиксов и расписания стримов. Сайт полностью статический и готов к размещению на GitHub Pages или Netlify.</p>
+        <div style="margin-top:12px;display:flex;gap:12px;flex-wrap:wrap">
+          <a class="pill" href="#gallery">Галерея</a>
+          <a class="pill" href="#comics">Комиксы</a>
+          <a class="pill" href="#streams">Расписание</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid" style="margin-top:18px">
+      <div class="cards card">
+        <h3 id="about">О Няпуру</h3>
+        <p class="muted">Няпуру — стример на Twitch. Образ: антропоморфный пингвин с чёрным оперением на спине и белым на животе, грудке и лице. Клюв и лапки оранжевые. Глаза — аниме-стиля с чёрным кольцом и белым центром. Чёлка с тремя вихрями, тёмно-красные акценты, бордовый/красный ошейник с медальоном «Nyapuru». Рост около 130 см.</p>
+        <p class="muted" style="margin-top:10px">Этот раздел собран автоматически из твоих заметок — поправь текст в коде, если нужно.</p>
+      </div>
+
+      <div class="card">
+        <h3 id="streams">Расписание стримов</h3>
+        <p class="muted">Пример расписания. Замени на реальные даты/времена в коде.</p>
+        <ul style="margin:8px 0 0 18px;color:var(--muted)">
+          <li>Понедельник — 20:00 CET — Развлечения / игры</li>
+          <li>Среда — 19:00 CET — Чит-стрим</li>
+          <li>Суббота — 18:30 CET — Q&amp;A и комиксы</li>
+        </ul>
+      </div>
+
+      <div class="card" style="grid-column:1/-1">
+        <h3 id="gallery">Галерея</h3>
+        <p class="muted">Нажми на любую миниатюру, чтобы открыть увеличенное изображение (плейсхолдеры SVG включены прямо в файл).</p>
+        <div class="gallery" id="galleryGrid">
+          <!-- 6 placeholder thumbs -->
+          <a href="#" class="thumb" data-title="Поза — спереди" data-desc="Поза спереди" onclick="openModal(event)">
+            <div class="svgwrap">
+              <svg viewBox="0 0 200 140" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <rect width="100%" height="100%" rx="8" fill="#061021" />
+                <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="14" fill="#7f8b99">Поза — спереди</text>
+              </svg>
+            </div>
+          </a>
+
+          <a href="#" class="thumb" data-title="Поза — сбоку" data-desc="Поза сбоку" onclick="openModal(event)">
+            <div class="svgwrap">
+              <svg viewBox="0 0 200 140" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <rect width="100%" height="100%" rx="8" fill="#061021" />
+                <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="14" fill="#7f8b99">Поза — сбоку</text>
+              </svg>
+            </div>
+          </a>
+
+          <a href="#" class="thumb" data-title="Поза — сзади" data-desc="Поза сзади" onclick="openModal(event)">
+            <div class="svgwrap">
+              <svg viewBox="0 0 200 140" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <rect width="100%" height="100%" rx="8" fill="#061021" />
+                <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="14" fill="#7f8b99">Поза — сзади</text>
+              </svg>
+            </div>
+          </a>
+
+          <a href="#" class="thumb" data-title="Комикс — кадр 1" data-desc="Аппуру просыпается" onclick="openModal(event)">
+            <div class="svgwrap">
+              <svg viewBox="0 0 200 140" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <rect width="100%" height="100%" rx="8" fill="#061021" />
+                <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="12" fill="#7f8b99">Комикс — кадр 1</text>
+              </svg>
+            </div>
+          </a>
+
+          <a href="#" class="thumb" data-title="Фан-арт 1" data-desc="Фан-арт" onclick="openModal(event)">
+            <div class="svgwrap">
+              <svg viewBox="0 0 200 140" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <rect width="100%" height="100%" rx="8" fill="#061021" />
+                <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="12" fill="#7f8b99">Фан-арт 1</text>
+              </svg>
+            </div>
+          </a>
+
+          <a href="#" class="thumb" data-title="Фан-арт 2" data-desc="Фан-арт" onclick="openModal(event)">
+            <div class="svgwrap">
+              <svg viewBox="0 0 200 140" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <rect width="100%" height="100%" rx="8" fill="#061021" />
+                <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="12" fill="#7f8b99">Фан-арт 2</text>
+              </svg>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 id="comics">Комиксы</h3>
+        <p class="muted">Раздел для твоих комиксов. Ниже — пример из сценария "Аппуру и Брокколи". Замени миниатюры на реальные картинки при готовности.</p>
+        <ol style="color:var(--muted);margin:8px 0 0 18px">
+          <li>Аппуру просыпается в кресле.</li>
+          <li>Идёт к холодильнику.</li>
+          <li>Находит брокколи — удивление.</li>
+          <li>В конце — холодильник вылетает в окно.</li>
+        </ol>
+      </div>
+
+      <div class="card">
+        <h3 id="contacts">Контакты и ссылки</h3>
+        <p class="muted">Добавь здесь реальные ссылки на Twitch, Twitter/X, Instagram, Ko-fi и т. д.</p>
+        <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+          <a class="pill" href="#">Twitch</a>
+          <a class="pill" href="#">Twitter/X</a>
+          <a class="pill" href="#">Instagram</a>
+          <a class="pill" href="#">Ko-fi</a>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <footer>
+    © Няпуру — фан-сайт • Этот проект — статический шаблон. Открой HTML файл в браузере или залей на GitHub Pages.
+  </footer>
+
+  <!-- modal element -->
+  <div class="modal" id="modal">
+    <div class="panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <strong id="mTitle">Изображение</strong>
+        <button onclick="closeModal()" aria-label="Закрыть">✕</button>
+      </div>
+      <div id="mContent" style="min-height:240px;background:#071022;border-radius:8px;display:grid;place-items:center;padding:12px">
+        <svg viewBox="0 0 600 360" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" rx="8" fill="#061021"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="20" fill="#7f8b99">Здесь появится увеличенное изображение</text></svg>
+      </div>
+      <p id="mDesc" class="muted" style="margin-top:10px">Описание</p>
+    </div>
+  </div>
+
+  <script>
+    // Mobile menu (simple) — clones nav links into a modal-like list
+    const menuBtn = document.getElementById('menuBtn');
+    menuBtn && menuBtn.addEventListener('click', ()=>{
+      const nav = document.querySelector('nav');
+      if (!nav) return;
+      const pop = document.createElement('div');
+      pop.style.position='fixed';pop.style.left=0;pop.style.top=0;pop.style.right=0;pop.style.bottom=0;pop.style.background='rgba(2,6,23,0.85)';pop.style.padding='30px';pop.style.zIndex=9999;
+      const inner = document.createElement('div');inner.style.maxWidth='420px';inner.style.margin='0 auto';inner.style.background='#061021';inner.style.borderRadius='12px';inner.style.padding='18px';
+      inner.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center"><strong>Меню</strong><button id="closeMenu">✕</button></div>';
+      const links = nav.querySelectorAll('a');
+      links.forEach(a=>{const b=document.createElement('div');b.style.marginTop='12px';b.innerHTML= a.outerHTML; inner.appendChild(b)});
+      pop.appendChild(inner);document.body.appendChild(pop);
+      document.getElementById('closeMenu').addEventListener('click', ()=>pop.remove());
+    });
+
+    // Modal image viewer
+    function openModal(e){e.preventDefault(); const a = e.currentTarget; const title = a.dataset.title || 'Изображение'; const desc = a.dataset.desc || '';
+      document.getElementById('mTitle').innerText = title; document.getElementById('mDesc').innerText = desc;
+      // clone svg from thumb into modal
+      const svg = a.querySelector('svg'); const mContent = document.getElementById('mContent'); mContent.innerHTML = '';
+      if (svg) { mContent.appendChild(svg.cloneNode(true)); }
+      document.getElementById('modal').style.display='flex';
+    }
+    function closeModal(){document.getElementById('modal').style.display='none'}
+    document.getElementById('modal').addEventListener('click',(ev)=>{ if(ev.target.id==='modal') closeModal(); });
+
+    // small enhancement: highlight nav on scroll
+    const sections = document.querySelectorAll('main section, main .card');
+    window.addEventListener('scroll', ()=>{
+      const links = document.querySelectorAll('a.navlink');
+      let found=null; sections.forEach(s=>{const r=s.getBoundingClientRect(); if(r.top<120 && r.bottom>120) found = s});
+      links.forEach(l=>l.style.opacity=found && l.getAttribute('href') && found.querySelector(l.getAttribute('href').replace('#','')) ? '1' : '0.7');
+    });
+  </script>
+</body>
+</html>
