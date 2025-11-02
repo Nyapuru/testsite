@@ -12,36 +12,35 @@ html,body{
   height:100%;
   margin:0;
   font-family:"Inter",sans-serif;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:flex-start;
   background:white;
   color:#222;
+  display:flex;
+  justify-content:center; /* по центру по вертикали */
+  align-items:center;     /* по центру по горизонтали */
+  flex-direction:column;
   touch-action: manipulation;
 }
 *{-webkit-tap-highlight-color: transparent;}
-h1{margin-top:30px;}
+h1{
+  margin-bottom:30px;
+  font-size:1.6em;
+}
 #penguin{
   width:160px;
   height:160px;
   cursor:pointer;
-  margin:50px auto; /* центрируем по горизонтали */
   display:block;
   transition: transform 0.1s ease;
   user-select:none;
-  -webkit-tap-highlight-color: transparent;
 }
 #penguin:active{
   transform: scale(0.95);
 }
-#counter{margin-top:10px;color:#999;font-size:0.9em;}
 </style>
 </head>
 <body>
 <h1 id="greet">Привет!</h1>
 <img id="penguin" src="https://img.cryptorank.io/coins/pudgy_penguins1734444110427.png" alt="Пингвин">
-<div id="counter">Кликов: 0 / 30</div>
 
 <script>
 const firebaseConfig = {
@@ -68,35 +67,31 @@ if (!tg.initDataUnsafe?.user) {
   tg.expand();
   const user = tg.initDataUnsafe.user;
   const greet = document.getElementById("greet");
-  const counterEl = document.getElementById("counter");
   const penguin = document.getElementById("penguin");
 
   greet.textContent = `Привет, ${user.first_name}!`;
 
   let clicks = 0;
-  counterEl.textContent = `Кликов: ${clicks} / 30`;
-
   const userDoc = db.collection("users").doc(user.id.toString());
 
   userDoc.get().then(docSnap => {
     if (!docSnap.exists) {
-      userDoc.set({ 
-        name: user.first_name, 
+      userDoc.set({
+        name: user.first_name,
         clicks: 0,
         photo_url: user.photo_url || "https://placekitten.com/32/32"
-      }).then(() => initClickHandler());
+      }).then(initClickHandler);
     } else {
       userDoc.set({
         name: user.first_name,
         photo_url: user.photo_url || "https://placekitten.com/32/32"
-      }, { merge: true }).then(() => initClickHandler());
+      }, { merge: true }).then(initClickHandler);
     }
   });
 
   function initClickHandler() {
     penguin.addEventListener("click", () => {
       clicks++;
-      counterEl.textContent = `Кликов: ${clicks} / 30`;
       userDoc.update({ clicks: FieldValue.increment(1) })
         .catch(err => console.log("Ошибка записи в Firestore:", err));
       if (clicks >= 30) {
@@ -108,4 +103,3 @@ if (!tg.initDataUnsafe?.user) {
 </script>
 </body>
 </html>
-
