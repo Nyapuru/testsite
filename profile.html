@@ -14,7 +14,6 @@ html,body{height:100%;margin:0;font-family:"Inter",sans-serif;display:flex;flex-
 a{display:block;margin-top:10px;color:#0066cc;text-decoration:none;}
 a:hover{text-decoration:underline;}
 </style>
-</head>
 <body>
 <div id="content"><p>Загрузка...</p></div>
 <script>
@@ -32,15 +31,13 @@ const db = firebase.firestore();
 const content = document.getElementById("content");
 const tg = window.Telegram.WebApp;
 
-if (!tg.initDataUnsafe?.user) {
-  window.location.href = "index.html";
-} else {
+if (!tg.initDataUnsafe?.user) window.location.href = "index.html";
+else {
   const user = tg.initDataUnsafe.user;
   const userDoc = db.collection("users").doc(user.id.toString());
 
-  // Подписка на изменения документа пользователя
   userDoc.onSnapshot(docSnap => {
-    const data = docSnap.data() || {};
+    const data = docSnap.exists ? docSnap.data() : { clicks: 0, name: user.first_name };
     const clicks = data.clicks || 0;
     const name = data.name || user.first_name;
 
