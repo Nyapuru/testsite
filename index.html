@@ -5,10 +5,8 @@
 <title>Nyapuru Club</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
 <style>
 html,body{height:100%;margin:0;font-family:"Inter",sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;background:white;color:#222;}
 h1{margin-top:30px;}
@@ -33,7 +31,6 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
-const auth = firebase.auth();
 
 const tg = window.Telegram.WebApp;
 
@@ -47,33 +44,36 @@ if (!tg.initDataUnsafe?.user) {
 } else {
   tg.expand();
   const user = tg.initDataUnsafe.user;
+  const greet = document.getElementById("greet");
+  const counterEl = document.getElementById("counter");
+  const penguin = document.getElementById("penguin");
 
-  // Анонимная авторизация Firebase
-  auth.signInAnonymously().then(() => {
-    const greet = document.getElementById("greet");
-    const counterEl = document.getElementById("counter");
-    const penguin = document.getElementById("penguin");
+  greet.textContent = `Привет, ${user.first_name}!`;
 
-    greet.textContent = `Привет, ${user.first_name}!`;
+  // Начальные клики
+  let clicks = Number(localStorage.getItem("nyap_clicks") || 0);
+  counterEl.textContent = `Кликов: ${clicks} / 30`;
 
-    let clicks = 0;
+  // Сохраняем начальные клики на Firebase, если их нет
+  db.collection("users").doc(user.id.toString()).set({
+    name: user.first_name,
+    clicks: clicks
+  });
+
+  penguin.addEventListener("click", () => {
+    clicks++;
     counterEl.textContent = `Кликов: ${clicks} / 30`;
+    localStorage.setItem("nyap_clicks", clicks);
 
-    penguin.addEventListener("click", () => {
-      clicks++;
-      counterEl.textContent = `Кликов: ${clicks} / 30`;
-      localStorage.setItem("nyap_clicks", clicks);
-
-      // Сохраняем на Firebase (глобальный рейтинг)
-      db.collection("users").doc(user.id.toString()).set({
-        name: user.first_name,
-        clicks: clicks
-      });
-
-      if (clicks >= 30) {
-        window.location.href = "profile.html";
-      }
+    // Автообновление кликов на Firebase
+    db.collection("users").doc(user.id.toString()).update({
+      clicks: clicks,
+      name: user.first_name
     });
+
+    if (clicks >= 30) {
+      window.location.href = "profile.html";
+    }
   });
 }
 </script>
