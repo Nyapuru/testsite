@@ -53,20 +53,17 @@ if (!tg.initDataUnsafe?.user) {
   let clicks = 0;
   counterEl.textContent = `Кликов: ${clicks} / 30`;
 
-  // Создаём документ пользователя сразу с нулевыми кликами
   const userDoc = db.collection("users").doc(user.id.toString());
-  userDoc.set({ name: user.first_name, clicks: clicks }, { merge: true });
+  userDoc.set({ name: user.first_name, clicks: 0 }, { merge: true });
 
   penguin.addEventListener("click", () => {
     clicks++;
     counterEl.textContent = `Кликов: ${clicks} / 30`;
+    userDoc.set({ clicks: clicks }, { merge: true });
 
-    // Обновляем клики и ждём завершения записи
-    userDoc.set({ clicks: clicks }, { merge: true }).then(() => {
-      if (clicks >= 30) {
-        window.location.href = "profile.html";
-      }
-    });
+    if (clicks >= 30) {
+      window.location.href = "profile.html";
+    }
   });
 }
 </script>
