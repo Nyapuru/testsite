@@ -37,35 +37,27 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 const tg = window.Telegram.WebApp;
-
-// Проверка Telegram WebApp
 if (!tg.initDataUnsafe?.user) {
   window.location.href = "index.html";
 } else {
   const user = tg.initDataUnsafe.user;
-
   const table = document.getElementById("rating-table");
   const backBtn = document.getElementById("backBtn");
+
   backBtn.addEventListener("click", ()=>{ window.location.href="profile.html"; });
 
-  // Функция для обновления таблицы
-  function updateRating(snapshot){
-    // Сначала очищаем все строки кроме заголовка
-    table.innerHTML = '<tr><th>#</th><th>Имя</th><th>Клики</th></tr>';
-    let index = 1;
-    snapshot.forEach(doc=>{
-      const data = doc.data();
-      const tr = document.createElement("tr");
-      tr.innerHTML = `<td>${index}</td><td>${data.name}</td><td>${data.clicks}</td>`;
-      table.appendChild(tr);
-      index++;
-    });
-  }
-
-  // Подписка на изменения в коллекции users в реальном времени
+  // Подписка на коллекцию users, сортировка по убыванию кликов, топ 10
   db.collection("users").orderBy("clicks","desc").limit(10)
     .onSnapshot(snapshot => {
-      updateRating(snapshot);
+      table.innerHTML = '<tr><th>#</th><th>Имя</th><th>Клики</th></tr>';
+      let index = 1;
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${index}</td><td>${data.name}</td><td>${data.clicks}</td>`;
+        table.appendChild(tr);
+        index++;
+      });
     });
 }
 </script>
