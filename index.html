@@ -59,7 +59,11 @@ if (!tg.initDataUnsafe?.user) {
   penguin.addEventListener("click", () => {
     clicks++;
     counterEl.textContent = `Кликов: ${clicks} / 30`;
-    userDoc.set({ clicks: clicks }, { merge: true });
+
+    // Суммируем клики в базе
+    userDoc.update({
+      clicks: firebase.firestore.FieldValue.increment(1)
+    }).catch(err => console.log("Ошибка записи в Firestore:", err));
 
     if (clicks >= 30) {
       window.location.href = "profile.html";
