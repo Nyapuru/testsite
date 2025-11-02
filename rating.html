@@ -44,6 +44,7 @@ else {
 
   backBtn.addEventListener("click", ()=>{ window.location.href="profile.html"; });
 
+  // Топ-10 пользователей в реальном времени
   db.collection("users").orderBy("clicks","desc").limit(10)
     .onSnapshot(snapshot => {
       table.innerHTML = '<tr><th>#</th><th>Имя</th><th>Клики</th></tr>';
@@ -60,4 +61,3 @@ else {
 </script>
 </body>
 </html>
-
