@@ -2,15 +2,57 @@
 <html lang="ru">
 <head>
   <meta charset="utf-8">
-  <title>Nyapuru Testsite</title>
+  <title>Nyapuru Club</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    body {
-      background: white;
+    html, body {
+      height: 100%;
       margin: 0;
+      background: white;
+      font-family: "Inter", sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      color: #222;
+      transition: background 0.3s, color 0.3s;
+    }
+    h1 {
+      font-size: 2em;
+      margin: 0;
+    }
+    p {
+      margin-top: 10px;
+      color: #777;
     }
   </style>
 </head>
 <body>
+  <h1 id="greet">Загрузка...</h1>
+  <p id="hint">Пожалуйста, подожди немного 🐧</p>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.expand(); // Разворачивает окно WebApp
+
+    const user = tg.initDataUnsafe?.user;
+    const greet = document.getElementById("greet");
+    const hint = document.getElementById("hint");
+
+    if (user && user.first_name) {
+      greet.textContent = `Привет, ${user.first_name}!`;
+      hint.textContent = "Добро пожаловать в Nyapuru Club 💫";
+    } else {
+      greet.textContent = "Привет, гость!";
+      hint.textContent = "Похоже, ты не через Telegram 😸";
+    }
+
+    // Реагируем на тему Telegram
+    if (tg.colorScheme === "dark") {
+      document.body.style.background = "#0f0f0f";
+      document.body.style.color = "#f0f0f0";
+    }
+  </script>
 </body>
 </html>
