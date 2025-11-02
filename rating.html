@@ -3,27 +3,38 @@
 <head>
 <meta charset="utf-8">
 <title>Рейтинг Nyapuru Club</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 <style>
-html,body{height:100%;margin:0;font-family:"Inter",sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:left;background:white;color:#222;padding-top:20px;}
-h1{margin-bottom:10px;text-align:center;}
+html,body{
+  height:100%;
+  margin:0;
+  font-family:"Inter",sans-serif;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  background:white;
+  color:#222;
+  padding-top:20px;
+  touch-action: manipulation;
+}
+*{-webkit-tap-highlight-color: transparent;}
+h1{text-align:center;margin-bottom:10px;}
 table{border-collapse:collapse;width:90%;max-width:500px;margin-bottom:20px;}
 td{border:1px solid #ccc;padding:8px 12px;vertical-align:middle;}
 tr:nth-child(even){background:#fafafa;}
 tr:nth-child(odd){background:#fff;}
-.avatar{width:32px;height:32px;border-radius:50%;vertical-align:middle;margin-right:0;display:block;}
-button{padding:8px 16px;font-size:1em;cursor:pointer;align-self:center;}
+.avatar{width:32px;height:32px;border-radius:50%;display:block;}
 td.name-cell{padding-left:8px;}
-td.count-cell{text-align:center;} /* Колонка с кликами по центру */
+td.count-cell{text-align:center;}
+button{padding:8px 16px;font-size:1em;cursor:pointer;align-self:center;}
 </style>
 <body>
 <h1>Топ Будильщиков</h1>
-<table id="rating-table">
-<!-- Заголовки убраны -->
-</table>
+<table id="rating-table"></table>
 <button id="backBtn">Вернуться в профиль</button>
 
 <script>
@@ -47,18 +58,17 @@ else {
   backBtn.addEventListener("click", ()=>{ window.location.href="profile.html"; });
 
   db.collection("users").orderBy("clicks","desc").limit(100)
-    .onSnapshot(snapshot => {
-      table.innerHTML = ""; // Заголовки убраны
-      let index = 1;
-      snapshot.forEach(doc => {
+    .onSnapshot(snapshot=>{
+      table.innerHTML="";
+      let index=1;
+      snapshot.forEach(doc=>{
         const data = doc.data();
         const tr = document.createElement("tr");
-
         const avatarImg = data.photo_url 
           ? `<img src="${data.photo_url}" class="avatar">` 
           : `<img src="https://placekitten.com/32/32" class="avatar">`;
 
-        tr.innerHTML = `
+        tr.innerHTML=`
           <td>${index}</td>
           <td>${avatarImg}</td>
           <td class="name-cell">${data.name}</td>
