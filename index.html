@@ -18,17 +18,19 @@ html,body{
   justify-content:flex-start;
   background:white;
   color:#222;
-  touch-action: manipulation; /* предотвращает двойной тап зум */
+  touch-action: manipulation;
 }
+*{-webkit-tap-highlight-color: transparent;}
 h1{margin-top:30px;}
 #penguin{
   width:160px;
   height:160px;
   cursor:pointer;
-  margin-top:50px;
+  margin:50px auto; /* центрируем по горизонтали */
+  display:block;
   transition: transform 0.1s ease;
   user-select:none;
-  -webkit-tap-highlight-color: transparent; /* убирает подсветку на iOS */
+  -webkit-tap-highlight-color: transparent;
 }
 #penguin:active{
   transform: scale(0.95);
@@ -57,7 +59,6 @@ const FieldValue = firebase.firestore.FieldValue;
 const tg = window.Telegram.WebApp;
 
 if (!tg.initDataUnsafe?.user) {
-  // Браузерная версия
   document.body.innerHTML = `
     <h1>Авторизуйтесь через Telegram</h1>
     <p>Сканируйте QR-код для доступа к приложению:</p>
@@ -77,7 +78,6 @@ if (!tg.initDataUnsafe?.user) {
 
   const userDoc = db.collection("users").doc(user.id.toString());
 
-  // Проверяем документ и сохраняем photo_url
   userDoc.get().then(docSnap => {
     if (!docSnap.exists) {
       userDoc.set({ 
@@ -97,11 +97,8 @@ if (!tg.initDataUnsafe?.user) {
     penguin.addEventListener("click", () => {
       clicks++;
       counterEl.textContent = `Кликов: ${clicks} / 30`;
-
-      // Суммируем клики в базе
       userDoc.update({ clicks: FieldValue.increment(1) })
         .catch(err => console.log("Ошибка записи в Firestore:", err));
-
       if (clicks >= 30) {
         window.location.href = "profile.html";
       }
