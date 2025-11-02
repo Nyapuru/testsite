@@ -57,7 +57,11 @@ if (!tg.initDataUnsafe?.user) {
 
   const userDoc = db.collection("users").doc(user.id.toString());
   // Создаем документ, если не существует
-  userDoc.set({ name: user.first_name, clicks: 0 }, { merge: true });
+userDoc.get().then(docSnap => {
+  if (!docSnap.exists) {
+    userDoc.set({ name: user.first_name, clicks: 0 });
+  }
+});
 
   penguin.addEventListener("click", () => {
     clicks++;
