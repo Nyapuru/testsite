@@ -27,12 +27,13 @@
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
     h1 {
-      font-size: 1.4em;
+      font-size: 1.6em;
       margin: 0;
     }
     p {
-      margin-top: 8px;
-      color: #777;
+      margin-top: 10px;
+      font-size: 1.1em;
+      color: #555;
     }
   </style>
 </head>
@@ -59,8 +60,8 @@
       avatar.src = "https://placekitten.com/200/200";
     }
 
-    // Загружаем и показываем статистику
-    const totalClicks = Number(localStorage.getItem("nyap_clicks") || 30);
+    // Загружаем суммарное количество кликов за все сессии
+    const totalClicks = Number(localStorage.getItem("nyap_clicks") || 0);
     stats.textContent = `Ты пытался разбудить Няпа ${totalClicks} раз!`;
 
     // Поддержка тёмной темы
