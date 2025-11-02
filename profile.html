@@ -39,48 +39,40 @@
 <script>
   const content = document.getElementById("content");
 
-  // Проверка Telegram WebApp
-  function isTelegramWebApp() {
+  // Подключаем скрипт Telegram WebApp
+  const script = document.createElement("script");
+  script.src = "https://telegram.org/js/telegram-web-app.js";
+  script.onload = () => {
     try {
-      return typeof window.Telegram !== "undefined" &&
-             typeof window.Telegram.WebApp !== "undefined" &&
-             typeof window.Telegram.WebApp.initData !== "undefined";
-    } catch {
-      return false;
-    }
-  }
-
-  // Если не Telegram → перенаправляем на index.html
-  if (!isTelegramWebApp()) {
-    window.location.href = "index.html";
-  } else {
-    // Telegram WebApp
-    const script = document.createElement("script");
-    script.src = "https://telegram.org/js/telegram-web-app.js";
-    script.onload = () => {
       const tg = window.Telegram.WebApp;
+
+      // Проверка Telegram WebApp после загрузки скрипта
+      const user = tg.initDataUnsafe?.user;
+      if (!user) {
+        window.location.href = "index.html"; // Браузер → редирект на index.html
+        return;
+      }
+
       tg.expand();
 
-      const user = tg.initDataUnsafe?.user;
-
-      // Получаем суммарные клики из localStorage
       const totalClicks = Number(localStorage.getItem("nyap_clicks") || 0);
 
-      // Отображаем контент
       content.innerHTML = `
-        <h1>Привет, ${user?.first_name || "Незнакомец"}!</h1>
-        <img id="avatar" src="${user?.photo_url || 'https://placekitten.com/200/200'}" alt="Аватар">
+        <h1>Привет, ${user.first_name}!</h1>
+        <img id="avatar" src="${user.photo_url || 'https://placekitten.com/200/200'}" alt="Аватар">
         <div id="stats">Ты пытался разбудить Няпа ${totalClicks} раз!</div>
       `;
 
-      // Поддержка тёмной темы
       if (tg.colorScheme === "dark") {
         document.body.style.background = "#0f0f0f";
         document.body.style.color = "#f0f0f0";
       }
-    };
-    document.body.appendChild(script);
-  }
+    } catch (e) {
+      // Любые ошибки → редирект на index.html
+      window.location.href = "index.html";
+    }
+  };
+  document.body.appendChild(script);
 </script>
 </body>
 </html>
