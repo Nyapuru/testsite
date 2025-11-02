@@ -15,49 +15,55 @@
       align-items: center;
       justify-content: center;
       background: white;
-      transition: background 0.3s, color 0.3s;
       color: #222;
-    }
-    h1 {
-      margin-bottom: 10px;
-      font-size: 1.8em;
+      text-align: center;
+      transition: background 0.3s, color 0.3s;
     }
     img {
-      width: 150px;
-      height: 150px;
+      width: 120px;
+      height: 120px;
       border-radius: 50%;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      font-size: 1.4em;
+      margin: 0;
     }
     p {
-      margin-top: 15px;
+      margin-top: 8px;
       color: #777;
     }
   </style>
 </head>
 <body>
-  <h1>Твой профиль</h1>
   <img id="avatar" src="" alt="Аватар">
-  <p id="name">Загрузка...</p>
+  <h1 id="greet">Привет!</h1>
+  <p id="stats">Загрузка статистики...</p>
 
   <script>
     const tg = window.Telegram.WebApp;
+    tg.expand();
+
     const user = tg.initDataUnsafe?.user;
-
+    const greet = document.getElementById("greet");
     const avatar = document.getElementById("avatar");
-    const nameEl = document.getElementById("name");
+    const stats = document.getElementById("stats");
 
+    // Показываем имя и аватар
     if (user) {
-      nameEl.textContent = `${user.first_name}${user.last_name ? " " + user.last_name : ""}`;
-      if (user.photo_url) {
-        avatar.src = user.photo_url;
-      } else {
-        avatar.src = "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png";
-      }
+      greet.textContent = `Привет, ${user.first_name}!`;
+      avatar.src = user.photo_url || "https://placekitten.com/200/200";
     } else {
-      nameEl.textContent = "Не удалось получить данные 😿";
-      avatar.src = "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png";
+      greet.textContent = "Привет, гость!";
+      avatar.src = "https://placekitten.com/200/200";
     }
 
+    // Загружаем и показываем статистику
+    const totalClicks = Number(localStorage.getItem("nyap_clicks") || 30);
+    stats.textContent = `Ты пытался разбудить Няпа ${totalClicks} раз!`;
+
+    // Поддержка тёмной темы
     if (tg.colorScheme === "dark") {
       document.body.style.background = "#0f0f0f";
       document.body.style.color = "#f0f0f0";
