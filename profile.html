@@ -1,102 +1,61 @@
 <!doctype html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8">
-  <title>Профиль Nyapuru Club</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-      font-family: "Inter", sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      background: white;
-      color: #222;
-      transition: background 0.3s, color 0.3s;
-    }
-    #avatar {
-      width: 150px;
-      height: 150px;
-      border-radius: 50%;
-      margin-top: 20px;
-    }
-    #stats {
-      margin-top: 10px;
-      font-size: 1em;
-      color: #555;
-    }
-    a {
-      display: block;
-      margin-top: 10px;
-      font-size: 0.95em;
-      color: #0066cc;
-      text-decoration: none;
-    }
-    a:hover { text-decoration: underline; }
-  </style>
+<meta charset="utf-8">
+<title>Профиль Nyapuru Club</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+<style>
+html, body {height:100%; margin:0; font-family:"Inter",sans-serif; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; background:white; color:#222;}
+#avatar{width:150px;height:150px;border-radius:50%;margin-top:20px;}
+#stats{margin-top:10px;color:#555;}
+a{display:block;margin-top:10px;color:#0066cc;text-decoration:none;}
+a:hover{text-decoration:underline;}
+</style>
 </head>
 <body>
-<div id="content">
-  <p>Загрузка...</p>
-</div>
+<div id="content"><p>Загрузка...</p></div>
 
 <script>
-const content = document.getElementById("content");
-
-const script = document.createElement("script");
-script.src = "https://telegram.org/js/telegram-web-app.js";
-script.onload = () => {
-  try {
-    const tg = window.Telegram.WebApp;
-    tg.expand();
-
-    const user = tg.initDataUnsafe?.user;
-    if (!user) {
-      window.location.href = "index.html";
-      return;
-    }
-
-    // Получаем суммарные клики за все сессии
-    const totalClicks = Number(localStorage.getItem("nyap_clicks") || 0);
-
-    // Сохраняем статистику по пользователю безопасно
-    let allUsers = [];
-    try {
-      allUsers = JSON.parse(localStorage.getItem("nyap_rating") || "[]");
-      if (!Array.isArray(allUsers)) allUsers = [];
-    } catch (e) { allUsers = []; }
-
-    const existing = allUsers.find(u => u.id === user.id);
-    if (existing) {
-      existing.clicks = totalClicks;
-    } else {
-      allUsers.push({ id: user.id, name: user.first_name, clicks: totalClicks });
-    }
-    localStorage.setItem("nyap_rating", JSON.stringify(allUsers));
-
-    // Отрисовываем контент
-    content.innerHTML = `
-      <h1>Привет, ${user.first_name}!</h1>
-      <img id="avatar" src="${user.photo_url || 'https://placekitten.com/200/200'}" alt="Аватар">
-      <div id="stats">Ты пытался разбудить Няпа ${totalClicks} раз!</div>
-      <a href="rating.html">Рейтинг</a>
-    `;
-
-    if (tg.colorScheme === "dark") {
-      document.body.style.background = "#0f0f0f";
-      document.body.style.color = "#f0f0f0";
-    }
-
-  } catch (e) {
-    // Любые ошибки → редирект на index.html
-    window.location.href = "index.html";
-  }
+const firebaseConfig = {
+  apiKey: "AIzaSyAsEXre9p0gcOHFDtjcMUN-meh3T4hU_xE",
+  authDomain: "nyapclub.firebaseapp.com",
+  projectId: "nyapclub",
+  storageBucket: "nyapclub.firebasestorage.app",
+  messagingSenderId: "53370013681",
+  appId: "1:53370013681:web:0f715a2ce01d69db65a650"
 };
-document.body.appendChild(script);
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+const content = document.getElementById("content");
+const tg = window.Telegram.WebApp;
+tg.expand();
+
+const user = tg.initDataUnsafe?.user;
+if(!user){ window.location.href="index.html"; }
+
+const clicks = Number(localStorage.getItem("nyap_clicks") || 0);
+
+// Сохраняем в Firebase
+db.collection("users").doc(user.id.toString()).set({
+  name: user.first_name,
+  clicks: clicks
+});
+
+content.innerHTML = `
+  <h1>Привет, ${user.first_name}!</h1>
+  <img id="avatar" src="${user.photo_url || 'https://placekitten.com/200/200'}" alt="Аватар">
+  <div id="stats">Ты пытался разбудить Няпа ${clicks} раз!</div>
+  <a href="rating.html">Рейтинг</a>
+`;
+
+if(tg.colorScheme==="dark"){
+  document.body.style.background="#0f0f0f";
+  document.body.style.color="#f0f0f0";
+}
 </script>
 </body>
 </html>
