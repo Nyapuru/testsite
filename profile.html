@@ -43,6 +43,7 @@ else {
     <a href="rating.html">Рейтинг</a>
   `;
 
+  // Слушаем изменения кликов в реальном времени
   userDoc.onSnapshot(docSnap => {
     const data = docSnap.exists ? docSnap.data() : { clicks: 0 };
     const clicks = data.clicks || 0;
