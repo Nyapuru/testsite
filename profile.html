@@ -29,6 +29,16 @@
       font-size: 1em;
       color: #555;
     }
+    a {
+      display: block;
+      margin-top: 10px;
+      font-size: 0.95em;
+      color: #0066cc;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
@@ -45,11 +55,10 @@
   script.onload = () => {
     try {
       const tg = window.Telegram.WebApp;
-
-      // Проверка Telegram WebApp после загрузки скрипта
       const user = tg.initDataUnsafe?.user;
+
       if (!user) {
-        window.location.href = "index.html"; // Браузер → редирект на index.html
+        window.location.href = "index.html";
         return;
       }
 
@@ -57,22 +66,22 @@
 
       const totalClicks = Number(localStorage.getItem("nyap_clicks") || 0);
 
+      // Сохраняем статистику по пользователю в глобальный рейтинг
+      let allUsers = JSON.parse(localStorage.getItem("nyap_rating") || "[]");
+      const existing = allUsers.find(u => u.id === user.id);
+      if (existing) {
+        existing.clicks = totalClicks;
+      } else {
+        allUsers.push({ id: user.id, name: user.first_name, clicks: totalClicks });
+      }
+      localStorage.setItem("nyap_rating", JSON.stringify(allUsers));
+
       content.innerHTML = `
         <h1>Привет, ${user.first_name}!</h1>
         <img id="avatar" src="${user.photo_url || 'https://placekitten.com/200/200'}" alt="Аватар">
         <div id="stats">Ты пытался разбудить Няпа ${totalClicks} раз!</div>
+        <a href="rating.html">Рейтинг</a>
       `;
 
       if (tg.colorScheme === "dark") {
         document.body.style.background = "#0f0f0f";
-        document.body.style.color = "#f0f0f0";
-      }
-    } catch (e) {
-      // Любые ошибки → редирект на index.html
-      window.location.href = "index.html";
-    }
-  };
-  document.body.appendChild(script);
-</script>
-</body>
-</html>
