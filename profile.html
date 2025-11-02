@@ -52,10 +52,10 @@
 
     // Показываем имя и аватар
     if (user) {
-      greet.textContent = `Привет, ${user.first_name}!`;
+      greet.textContent = `${user.first_name}!`;
       avatar.src = user.photo_url || "https://placekitten.com/200/200";
     } else {
-      greet.textContent = "Привет, гость!";
+      greet.textContent = "Незнакомец";
       avatar.src = "https://placekitten.com/200/200";
     }
 
