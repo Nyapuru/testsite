@@ -50,23 +50,21 @@ if (!tg.initDataUnsafe?.user) {
 
   greet.textContent = `Привет, ${user.first_name}!`;
 
-  // Начинаем с 0 кликов для этой сессии
   let clicks = 0;
   counterEl.textContent = `Кликов: ${clicks} / 30`;
+
+  // Создаём документ сразу
+  const userDoc = db.collection("users").doc(user.id.toString());
+  userDoc.set({
+    name: user.first_name,
+    clicks: clicks
+  }, { merge: true });
 
   penguin.addEventListener("click", () => {
     clicks++;
     counterEl.textContent = `Кликов: ${clicks} / 30`;
-
-    // Сохраняем в Firebase **только текущие клики сессии**
-    db.collection("users").doc(user.id.toString()).set({
-      name: user.first_name,
-      clicks: clicks
-    });
-
-    if (clicks >= 30) {
-      window.location.href = "profile.html";
-    }
+    userDoc.update({ clicks: clicks });
+    if (clicks >= 30) window.location.href = "profile.html";
   });
 }
 </script>
