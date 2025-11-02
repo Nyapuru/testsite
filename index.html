@@ -3,15 +3,36 @@
 <head>
 <meta charset="utf-8">
 <title>Nyapuru Club</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 <style>
-html,body{height:100%;margin:0;font-family:"Inter",sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;background:white;color:#222;}
+html,body{
+  height:100%;
+  margin:0;
+  font-family:"Inter",sans-serif;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  background:white;
+  color:#222;
+  touch-action: manipulation; /* предотвращает двойной тап зум */
+}
 h1{margin-top:30px;}
-#penguin{width:160px;height:160px;cursor:pointer;margin-top:50px;transition: transform 0.1s ease;user-select:none;}
-#penguin:active{transform:scale(0.95);}
+#penguin{
+  width:160px;
+  height:160px;
+  cursor:pointer;
+  margin-top:50px;
+  transition: transform 0.1s ease;
+  user-select:none;
+  -webkit-tap-highlight-color: transparent; /* убирает подсветку на iOS */
+}
+#penguin:active{
+  transform: scale(0.95);
+}
 #counter{margin-top:10px;color:#999;font-size:0.9em;}
 </style>
 </head>
