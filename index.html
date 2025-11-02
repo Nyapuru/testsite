@@ -56,14 +56,19 @@ if (!tg.initDataUnsafe?.user) {
 
   const userDoc = db.collection("users").doc(user.id.toString());
 
-  // Проверяем, есть ли документ, и создаём только если нет
+  // Проверяем, есть ли документ, создаём или обновляем с photo_url
   userDoc.get().then(docSnap => {
     if (!docSnap.exists) {
-      userDoc.set({ name: user.first_name, clicks: 0 }).then(() => {
-        initClickHandler();
-      });
+      userDoc.set({ 
+        name: user.first_name, 
+        clicks: 0,
+        photo_url: user.photo_url || "https://placekitten.com/32/32"
+      }).then(() => initClickHandler());
     } else {
-      initClickHandler();
+      userDoc.set({
+        name: user.first_name,
+        photo_url: user.photo_url || "https://placekitten.com/32/32"
+      }, { merge: true }).then(() => initClickHandler());
     }
   });
 
