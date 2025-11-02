@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>Рейтинг Nyapuru Club</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: "Inter", sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      text-align: center;
+      background: white;
+      color: #222;
+      padding-top: 20px;
+    }
+    h1 { margin-bottom: 10px; }
+    table {
+      border-collapse: collapse;
+      width: 90%;
+      max-width: 400px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px 12px;
+    }
+    th { background: #f0f0f0; }
+    tr:nth-child(even) { background: #fafafa; }
+    tr:nth-child(odd) { background: #fff; }
+  </style>
+</head>
+<body>
+  <h1>Топ-10 Будильщиков</h1>
+  <table id="rating-table">
+    <tr>
+      <th>#</th>
+      <th>Имя</th>
+      <th>Клики</th>
+    </tr>
+  </table>
+
+<script>
+  // Проверка Telegram WebApp
+  function isTelegramWebApp() {
+    try {
+      return typeof window.Telegram !== "undefined" &&
+             typeof window.Telegram.WebApp !== "undefined" &&
+             typeof window.Telegram.WebApp.initData !== "undefined";
+    } catch {
+      return false;
+    }
+  }
+
+  if (!isTelegramWebApp()) {
+    window.location.href = "index.html";
+  } else {
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    // Получаем всех пользователей и сортируем по убыванию кликов
+    const allUsers = JSON.parse(localStorage.getItem("nyap_rating") || "[]");
+    allUsers.sort((a,b) => b.clicks - a.clicks);
+
+    const table = document.getElementById("rating-table");
+
+    // Выводим топ 10
+    allUsers.slice(0,10).forEach((user, index) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${index + 1}</td><td>${user.name}</td><td>${user.clicks}</td>`;
+      table.appendChild(tr);
+    });
+
+    if (tg.colorScheme === "dark") {
+      document.body.style.background = "#0f0f0f";
+      document.body.style.color = "#f0f0f0";
+    }
+  }
+</script>
+</body>
+</html>
