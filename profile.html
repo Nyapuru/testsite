@@ -7,7 +7,6 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
 <style>
 html,body{height:100%;margin:0;font-family:"Inter",sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:white;color:#222;}
 #avatar{width:150px;height:150px;border-radius:50%;margin-top:20px;}
@@ -29,7 +28,6 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
-const auth = firebase.auth();
 
 const content = document.getElementById("content");
 const tg = window.Telegram.WebApp;
@@ -39,14 +37,11 @@ if (!tg.initDataUnsafe?.user) {
 } else {
   const user = tg.initDataUnsafe.user;
 
-  auth.signInAnonymously().then(() => {
-    const clicks = Number(localStorage.getItem("nyap_clicks") || 0);
-
-    // Сохраняем на Firebase
-    db.collection("users").doc(user.id.toString()).set({
-      name: user.first_name,
-      clicks: clicks
-    });
+  // Подписка на изменения кликов пользователя в реальном времени
+  const userDoc = db.collection("users").doc(user.id.toString());
+  userDoc.onSnapshot(docSnap => {
+    const data = docSnap.data();
+    const clicks = data?.clicks || 0;
 
     content.innerHTML = `
       <h1>Привет, ${user.first_name}!</h1>
