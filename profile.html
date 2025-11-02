@@ -2,9 +2,8 @@
 <html lang="ru">
 <head>
   <meta charset="utf-8">
-  <title>Профиль | Nyapuru Club</title>
+  <title>Профиль Nyapuru Club</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     html, body {
       height: 100%;
@@ -14,62 +13,70 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      text-align: center;
       background: white;
       color: #222;
-      text-align: center;
       transition: background 0.3s, color 0.3s;
     }
-    img {
-      width: 120px;
-      height: 120px;
+    #avatar {
+      width: 150px;
+      height: 150px;
       border-radius: 50%;
-      margin-bottom: 20px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin-top: 20px;
     }
-    h1 {
-      font-size: 1.6em;
-      margin: 0;
-    }
-    p {
+    #stats {
       margin-top: 10px;
-      font-size: 1.1em;
+      font-size: 1em;
       color: #555;
     }
+    #qr-container img { width: 150px; height: 150px; margin-top: 10px; }
   </style>
 </head>
 <body>
-  <img id="avatar" src="" alt="Аватар">
-  <h1 id="greet">Привет!</h1>
-  <p id="stats">Загрузка статистики...</p>
+<div id="content">
+  <p>Загрузка...</p>
+</div>
 
-  <script>
-    const tg = window.Telegram.WebApp;
-    tg.expand();
+<script>
+  const content = document.getElementById("content");
 
-    const user = tg.initDataUnsafe?.user;
-    const greet = document.getElementById("greet");
-    const avatar = document.getElementById("avatar");
-    const stats = document.getElementById("stats");
-
-    // Показываем имя и аватар
-    if (user) {
-      greet.textContent = `${user.first_name}!`;
-      avatar.src = user.photo_url || "https://placekitten.com/200/200";
-    } else {
-      greet.textContent = "Незнакомец";
-      avatar.src = "https://placekitten.com/200/200";
+  function isTelegramWebApp() {
+    try {
+      return typeof window.Telegram !== "undefined" &&
+             typeof window.Telegram.WebApp !== "undefined" &&
+             typeof window.Telegram.WebApp.initData !== "undefined";
+    } catch {
+      return false;
     }
+  }
 
-    // Загружаем суммарное количество кликов за все сессии
-    const totalClicks = Number(localStorage.getItem("nyap_clicks") || 0);
-    stats.textContent = `Ты пытался разбудить Няпа ${totalClicks} раз!`;
+  // Если пользователь не в WebApp → редирект на QR-код
+  if (!isTelegramWebApp()) {
+    window.location.href = "web.html";
+  } else {
+    // Telegram WebApp
+    const script = document.createElement("script");
+    script.src = "https://telegram.org/js/telegram-web-app.js";
+    script.onload = () => {
+      const tg = window.Telegram.WebApp;
+      tg.expand();
+      const user = tg.initDataUnsafe?.user;
 
-    // Поддержка тёмной темы
-    if (tg.colorScheme === "dark") {
-      document.body.style.background = "#0f0f0f";
-      document.body.style.color = "#f0f0f0";
-    }
-  </script>
+      const totalClicks = Number(localStorage.getItem("nyap_clicks") || 0);
+
+      content.innerHTML = `
+        <h1>Привет, ${user?.first_name || "Незнакомец"}!</h1>
+        <img id="avatar" src="${user?.photo_url || 'https://placekitten.com/200/200'}" alt="Аватар">
+        <div id="stats">Ты пытался разбудить Няпа ${totalClicks} раз!</div>
+      `;
+
+      if (tg.colorScheme === "dark") {
+        document.body.style.background = "#0f0f0f";
+        document.body.style.color = "#f0f0f0";
+      }
+    };
+    document.body.appendChild(script);
+  }
+</script>
 </body>
 </html>
-
