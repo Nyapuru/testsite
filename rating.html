@@ -7,8 +7,9 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
 <style>
-html, body {height:100%; margin:0; font-family:"Inter",sans-serif; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; text-align:center; background:white; color:#222; padding-top:20px;}
+html,body{height:100%;margin:0;font-family:"Inter",sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;background:white;color:#222;padding-top:20px;}
 h1{margin-bottom:10px;}
 table{border-collapse:collapse;width:90%;max-width:400px;}
 th,td{border:1px solid #ccc;padding:8px 12px;}
@@ -33,33 +34,25 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+const auth = firebase.auth();
 
 const tg = window.Telegram.WebApp;
-tg.expand();
-
-const user = tg.initDataUnsafe?.user;
-if(!user){ window.location.href="index.html"; }
-
-const table = document.getElementById("rating-table");
-
-db.collection("users")
-  .orderBy("clicks","desc")
-  .limit(10)
-  .get()
-  .then(snapshot=>{
-    let index=1;
-    snapshot.forEach(doc=>{
-      const data = doc.data();
-      const tr=document.createElement("tr");
-      tr.innerHTML=`<td>${index}</td><td>${data.name}</td><td>${data.clicks}</td>`;
-      table.appendChild(tr);
-      index++;
+if (!tg.initDataUnsafe?.user) {
+  window.location.href = "index.html";
+} else {
+  auth.signInAnonymously().then(() => {
+    const table = document.getElementById("rating-table");
+    db.collection("users").orderBy("clicks","desc").limit(10).get().then(snapshot=>{
+      let index=1;
+      snapshot.forEach(doc=>{
+        const data = doc.data();
+        const tr = document.createElement("tr");
+        tr.innerHTML=`<td>${index}</td><td>${data.name}</td><td>${data.clicks}</td>`;
+        table.appendChild(tr);
+        index++;
+      });
     });
   });
-
-if(tg.colorScheme==="dark"){
-  document.body.style.background="#0f0f0f";
-  document.body.style.color="#f0f0f0";
 }
 </script>
 </body>
