@@ -4,93 +4,68 @@
   <meta charset="utf-8">
   <title>Nyapuru Club</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
   <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-      font-family: "Inter", sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      background: white;
-      color: #222;
-      transition: background 0.3s, color 0.3s;
-    }
-    #penguin { width: 160px; height: 160px; cursor: pointer; margin-top: 20px; user-select: none; transition: transform 0.1s ease; }
-    #penguin:active { transform: scale(0.95); }
-    #counter { margin-top: 10px; color: #999; font-size: 0.9em; }
-    #qr-container img { width: 150px; height: 150px; margin-top: 10px; }
+    html, body { height:100%; margin:0; font-family:"Inter",sans-serif; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; background:white; color:#222; }
+    h1 { margin-top:30px; }
+    #penguin { width:160px; height:160px; cursor:pointer; margin-top:50px; transition: transform 0.1s ease; user-select:none; }
+    #penguin:active { transform:scale(0.95); }
+    #counter { margin-top:10px; color:#999; font-size:0.9em; }
   </style>
 </head>
 <body>
-<div id="content">
-  <p>Загрузка...</p>
-</div>
+  <h1 id="greet">Привет!</h1>
+  <img id="penguin" src="https://img.cryptorank.io/coins/pudgy_penguins1734444110427.png" alt="Пингвин">
+  <div id="counter">Кликов: 0 / 30</div>
 
 <script>
-  const content = document.getElementById("content");
-
-  // Подключаем скрипт Telegram WebApp
-  const script = document.createElement("script");
-  script.src = "https://telegram.org/js/telegram-web-app.js";
-  script.onload = () => {
-    try {
-      const tg = window.Telegram.WebApp;
-
-      // Проверяем, есть ли пользователь (значит Telegram WebApp)
-      const user = tg.initDataUnsafe?.user;
-
-      if (user) {
-        // Telegram WebApp → интерактив с пингвином
-        tg.expand();
-        content.innerHTML = `
-          <h1>Привет, ${user.first_name}!</h1>
-          <img id="penguin" src="https://img.cryptorank.io/coins/pudgy_penguins1734444110427.png" alt="Пингвин">
-          <div id="counter">Кликов: 0 / 30</div>
-        `;
-
-        const penguin = document.getElementById("penguin");
-        const counter = document.getElementById("counter");
-        let clicks = 0;
-        counter.textContent = `Кликов: ${clicks} / 30`;
-
-        penguin.addEventListener("click", () => {
-          clicks++;
-          const totalClicks = Number(localStorage.getItem("nyap_clicks") || 0) + 1;
-          localStorage.setItem("nyap_clicks", totalClicks);
-          counter.textContent = `Кликов: ${clicks} / 30`;
-          if (clicks >= 30) window.location.href = "profile.html";
-        });
-
-        if (tg.colorScheme === "dark") {
-          document.body.style.background = "#0f0f0f";
-          document.body.style.color = "#f0f0f0";
-        }
-
-      } else {
-        // Обычный браузер → QR-код
-        content.innerHTML = `
-          <h1>Авторизуйтесь с помощью Telegram</h1>
-          <p>Сканируйте QR-код и откройте бота @nyapclub_bot</p>
-          <div id="qr-container">
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://t.me/nyapclub_bot" alt="QR-код">
-          </div>
-        `;
-      }
-    } catch (e) {
-      // На случай, если Telegram WebApp не доступен
-      content.innerHTML = `
-        <h1>Авторизуйтесь с помощью Telegram</h1>
-        <p>Сканируйте QR-код и откройте бота @nyapclub_bot</p>
-        <div id="qr-container">
-          <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://t.me/nyapclub_bot" alt="QR-код">
-        </div>
-      `;
-    }
+  // Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyAsEXre9p0gcOHFDtjcMUN-meh3T4hU_xE",
+    authDomain: "nyapclub.firebaseapp.com",
+    projectId: "nyapclub",
+    storageBucket: "nyapclub.firebasestorage.app",
+    messagingSenderId: "53370013681",
+    appId: "1:53370013681:web:0f715a2ce01d69db65a650"
   };
-  document.body.appendChild(script);
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  const tg = window.Telegram.WebApp;
+  tg.expand();
+
+  const user = tg.initDataUnsafe?.user;
+  if (!user) { 
+    window.location.href = "index.html"; // браузерная защита
+  }
+
+  const greet = document.getElementById("greet");
+  const counterEl = document.getElementById("counter");
+  const penguin = document.getElementById("penguin");
+
+  greet.textContent = `Привет, ${user.first_name}!`;
+
+  let clicks = 0;
+  counterEl.textContent = `Кликов: ${clicks} / 30`;
+
+  penguin.addEventListener("click", () => {
+    clicks++;
+    counterEl.textContent = `Кликов: ${clicks} / 30`;
+    localStorage.setItem("nyap_clicks", clicks);
+
+    // Отправка на Firebase
+    db.collection("users").doc(user.id.toString()).set({
+      name: user.first_name,
+      clicks: clicks
+    });
+
+    if (clicks >= 30) {
+      window.location.href = "profile.html";
+    }
+  });
 </script>
 </body>
 </html>
