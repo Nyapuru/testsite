@@ -17,6 +17,7 @@ tr:nth-child(odd){background:#fff;}
 .avatar{width:32px;height:32px;border-radius:50%;vertical-align:middle;margin-right:0;display:block;}
 button{padding:8px 16px;font-size:1em;cursor:pointer;align-self:center;}
 td.name-cell{padding-left:8px;}
+td.count-cell{text-align:center;} /* Колонка с кликами по центру */
 </style>
 <body>
 <h1>Топ Будильщиков</h1>
@@ -61,7 +62,7 @@ else {
           <td>${index}</td>
           <td>${avatarImg}</td>
           <td class="name-cell">${data.name}</td>
-          <td>${data.clicks}</td>
+          <td class="count-cell">${data.clicks}</td>
         `;
         table.appendChild(tr);
         index++;
