@@ -39,7 +39,6 @@ const db = firebase.firestore();
 const tg = window.Telegram.WebApp;
 if (!tg.initDataUnsafe?.user) window.location.href = "index.html";
 else {
-  const user = tg.initDataUnsafe.user;
   const table = document.getElementById("rating-table");
   const backBtn = document.getElementById("backBtn");
 
@@ -61,3 +60,4 @@ else {
 </script>
 </body>
 </html>
+
