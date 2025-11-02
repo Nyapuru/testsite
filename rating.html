@@ -7,21 +7,22 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
 <style>
 html,body{height:100%;margin:0;font-family:"Inter",sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;background:white;color:#222;padding-top:20px;}
 h1{margin-bottom:10px;}
-table{border-collapse:collapse;width:90%;max-width:400px;}
+table{border-collapse:collapse;width:90%;max-width:400px;margin-bottom:20px;}
 th,td{border:1px solid #ccc;padding:8px 12px;}
 th{background:#f0f0f0;}
 tr:nth-child(even){background:#fafafa;}
 tr:nth-child(odd){background:#fff;}
+button{padding:8px 16px;font-size:1em;cursor:pointer;}
 </style>
 <body>
 <h1>Топ 10 пользователей</h1>
 <table id="rating-table">
 <tr><th>#</th><th>Имя</th><th>Клики</th></tr>
 </table>
+<button id="backBtn">Вернуться в профиль</button>
 
 <script>
 const firebaseConfig = {
@@ -34,25 +35,38 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
-const auth = firebase.auth();
 
 const tg = window.Telegram.WebApp;
+
+// Проверка Telegram WebApp
 if (!tg.initDataUnsafe?.user) {
   window.location.href = "index.html";
 } else {
-  auth.signInAnonymously().then(() => {
-    const table = document.getElementById("rating-table");
-    db.collection("users").orderBy("clicks","desc").limit(10).get().then(snapshot=>{
-      let index=1;
-      snapshot.forEach(doc=>{
-        const data = doc.data();
-        const tr = document.createElement("tr");
-        tr.innerHTML=`<td>${index}</td><td>${data.name}</td><td>${data.clicks}</td>`;
-        table.appendChild(tr);
-        index++;
-      });
+  const user = tg.initDataUnsafe.user;
+
+  const table = document.getElementById("rating-table");
+  const backBtn = document.getElementById("backBtn");
+  backBtn.addEventListener("click", ()=>{ window.location.href="profile.html"; });
+
+  // Функция для обновления таблицы
+  function updateRating(snapshot){
+    // Сначала очищаем все строки кроме заголовка
+    table.innerHTML = '<tr><th>#</th><th>Имя</th><th>Клики</th></tr>';
+    let index = 1;
+    snapshot.forEach(doc=>{
+      const data = doc.data();
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${index}</td><td>${data.name}</td><td>${data.clicks}</td>`;
+      table.appendChild(tr);
+      index++;
     });
-  });
+  }
+
+  // Подписка на изменения в коллекции users в реальном времени
+  db.collection("users").orderBy("clicks","desc").limit(10)
+    .onSnapshot(snapshot => {
+      updateRating(snapshot);
+    });
 }
 </script>
 </body>
