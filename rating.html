@@ -10,17 +10,18 @@
 <style>
 html,body{height:100%;margin:0;font-family:"Inter",sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;background:white;color:#222;padding-top:20px;}
 h1{margin-bottom:10px;}
-table{border-collapse:collapse;width:90%;max-width:400px;margin-bottom:20px;}
-th,td{border:1px solid #ccc;padding:8px 12px;}
+table{border-collapse:collapse;width:90%;max-width:500px;margin-bottom:20px;}
+th,td{border:1px solid #ccc;padding:8px 12px;vertical-align:middle;}
 th{background:#f0f0f0;}
 tr:nth-child(even){background:#fafafa;}
 tr:nth-child(odd){background:#fff;}
+.avatar{width:32px;height:32px;border-radius:50%;vertical-align:middle;margin-right:8px;}
 button{padding:8px 16px;font-size:1em;cursor:pointer;}
 </style>
 <body>
-<h1>Топ 10 пользователей</h1>
+<h1>Топ Будильщиков</h1>
 <table id="rating-table">
-<tr><th>#</th><th>Имя</th><th>Клики</th></tr>
+<tr><th>№</th><th>Имя</th><th>Тыки</th></tr>
 </table>
 <button id="backBtn">Вернуться в профиль</button>
 
@@ -44,15 +45,15 @@ else {
 
   backBtn.addEventListener("click", ()=>{ window.location.href="profile.html"; });
 
-  // Топ-10 пользователей в реальном времени
-  db.collection("users").orderBy("clicks","desc").limit(10)
+  db.collection("users").orderBy("clicks","desc").limit(100)
     .onSnapshot(snapshot => {
-      table.innerHTML = '<tr><th>#</th><th>Имя</th><th>Клики</th></tr>';
+      table.innerHTML = '<tr><th>№</th><th>Имя</th><th>Тыки</th></tr>';
       let index = 1;
       snapshot.forEach(doc => {
         const data = doc.data();
+        const avatar = data.photo_url ? `<img src="${data.photo_url}" class="avatar">` : `<img src="https://placekitten.com/32/32" class="avatar">`;
         const tr = document.createElement("tr");
-        tr.innerHTML = `<td>${index}</td><td>${data.name}</td><td>${data.clicks}</td>`;
+        tr.innerHTML = `<td>${index}</td><td>${avatar}${data.name}</td><td>${data.clicks}</td>`;
         table.appendChild(tr);
         index++;
       });
@@ -61,3 +62,4 @@ else {
 </script>
 </body>
 </html>
+
