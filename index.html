@@ -35,9 +35,8 @@ const FieldValue = firebase.firestore.FieldValue;
 
 const tg = window.Telegram.WebApp;
 
-// Проверяем Telegram WebApp или браузер
 if (!tg.initDataUnsafe?.user) {
-  // Браузер
+  // Браузерная версия
   document.body.innerHTML = `
     <h1>Авторизуйтесь через Telegram</h1>
     <p>Сканируйте QR-код для доступа к приложению:</p>
@@ -56,25 +55,32 @@ if (!tg.initDataUnsafe?.user) {
   counterEl.textContent = `Кликов: ${clicks} / 30`;
 
   const userDoc = db.collection("users").doc(user.id.toString());
-  // Создаем документ, если не существует
-userDoc.get().then(docSnap => {
-  if (!docSnap.exists) {
-    userDoc.set({ name: user.first_name, clicks: 0 });
-  }
-});
 
-  penguin.addEventListener("click", () => {
-    clicks++;
-    counterEl.textContent = `Кликов: ${clicks} / 30`;
-
-    // Суммируем клики в базе
-    userDoc.update({ clicks: FieldValue.increment(1) })
-      .catch(err => console.log("Ошибка записи в Firestore:", err));
-
-    if (clicks >= 30) {
-      window.location.href = "profile.html";
+  // Проверяем, есть ли документ, и создаём только если нет
+  userDoc.get().then(docSnap => {
+    if (!docSnap.exists) {
+      userDoc.set({ name: user.first_name, clicks: 0 }).then(() => {
+        initClickHandler();
+      });
+    } else {
+      initClickHandler();
     }
   });
+
+  function initClickHandler() {
+    penguin.addEventListener("click", () => {
+      clicks++;
+      counterEl.textContent = `Кликов: ${clicks} / 30`;
+
+      // Суммируем клики в базе
+      userDoc.update({ clicks: FieldValue.increment(1) })
+        .catch(err => console.log("Ошибка записи в Firestore:", err));
+
+      if (clicks >= 30) {
+        window.location.href = "profile.html";
+      }
+    });
+  }
 }
 </script>
 </body>
