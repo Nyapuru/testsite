@@ -29,7 +29,6 @@
       font-size: 1em;
       color: #555;
     }
-    #qr-container img { width: 150px; height: 150px; margin-top: 10px; }
   </style>
 </head>
 <body>
@@ -40,6 +39,7 @@
 <script>
   const content = document.getElementById("content");
 
+  // Проверка Telegram WebApp
   function isTelegramWebApp() {
     try {
       return typeof window.Telegram !== "undefined" &&
@@ -50,7 +50,7 @@
     }
   }
 
-  // Если пользователь не в WebApp → редирект на QR-код
+  // Если не Telegram → перенаправляем на index.html
   if (!isTelegramWebApp()) {
     window.location.href = "index.html";
   } else {
@@ -60,16 +60,20 @@
     script.onload = () => {
       const tg = window.Telegram.WebApp;
       tg.expand();
+
       const user = tg.initDataUnsafe?.user;
 
+      // Получаем суммарные клики из localStorage
       const totalClicks = Number(localStorage.getItem("nyap_clicks") || 0);
 
+      // Отображаем контент
       content.innerHTML = `
         <h1>Привет, ${user?.first_name || "Незнакомец"}!</h1>
         <img id="avatar" src="${user?.photo_url || 'https://placekitten.com/200/200'}" alt="Аватар">
         <div id="stats">Ты пытался разбудить Няпа ${totalClicks} раз!</div>
       `;
 
+      // Поддержка тёмной темы
       if (tg.colorScheme === "dark") {
         document.body.style.background = "#0f0f0f";
         document.body.style.color = "#f0f0f0";
