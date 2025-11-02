@@ -44,9 +44,6 @@
   </style>
 </head>
 <body>
-  <h1 id="greet">Загрузка...</h1>
-  <p id="hint">Пожалуйста, подожди немного 🐧</p>
-
   <img id="penguin" src="https://img.cryptorank.io/coins/pudgy_penguins1734444110427.png" alt="Пингвин">
   <div id="counter">Кликов: 0 / 30</div>
 
@@ -65,8 +62,8 @@
     if (user?.first_name) {
       greet.textContent = `Привет, ${user.first_name}!`;
     } else {
-      greet.textContent = "Привет, гость!";
-      hint.textContent = "Похоже, ты не через Telegram 😸";
+      greet.textContent = "Привет, незнакомец!";
+      hint.textContent = "Попробуй авторизоваться через Telegram";
     }
 
     penguin.addEventListener("click", () => {
