@@ -61,14 +61,17 @@
       greet.textContent = "Привет, незнакомец!";
     }
 
-    // Получаем прошлое количество кликов
-    let clicks = Number(localStorage.getItem("nyap_clicks") || 0);
+    // Текущая сессия начинается с 0
+    let clicks = 0;
     counter.textContent = `Кликов: ${clicks} / 30`;
 
     // Обработчик клика по пингвину
     penguin.addEventListener("click", () => {
       clicks++;
-      localStorage.setItem("nyap_clicks", clicks);
+      // Сохраняем суммарное значение для профиля
+      const totalClicks = Number(localStorage.getItem("nyap_clicks") || 0) + 1;
+      localStorage.setItem("nyap_clicks", totalClicks);
+
       counter.textContent = `Кликов: ${clicks} / 30`;
       if (clicks >= 30) {
         window.location.href = "profile.html";
@@ -83,4 +86,3 @@
   </script>
 </body>
 </html>
-
