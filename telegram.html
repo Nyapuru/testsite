@@ -13,27 +13,13 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      text-align: center;
       background: white;
       color: #222;
-      text-align: center;
-      transition: background 0.3s, color 0.3s;
     }
-    #penguin {
-      width: 160px;
-      height: 160px;
-      cursor: pointer;
-      transition: transform 0.1s ease;
-      user-select: none;
-      margin-top: 20px;
-    }
-    #penguin:active {
-      transform: scale(0.95);
-    }
-    #counter {
-      margin-top: 10px;
-      color: #999;
-      font-size: 0.9em;
-    }
+    #penguin { width: 160px; height: 160px; cursor: pointer; margin-top: 20px; user-select: none; transition: transform 0.1s ease; }
+    #penguin:active { transform: scale(0.95); }
+    #counter { margin-top: 10px; color: #999; font-size: 0.9em; }
   </style>
 </head>
 <body>
@@ -47,15 +33,12 @@
 <script>
   const tg = window.Telegram.WebApp;
   tg.expand();
-
   const user = tg.initDataUnsafe?.user;
   const greet = document.querySelector("h1");
   const penguin = document.getElementById("penguin");
   const counter = document.getElementById("counter");
 
-  if (user?.first_name) {
-    greet.textContent = `Привет, ${user.first_name}!`;
-  }
+  if (user?.first_name) greet.textContent = `Привет, ${user.first_name}!`;
 
   let clicks = 0;
   counter.textContent = `Кликов: ${clicks} / 30`;
@@ -64,11 +47,8 @@
     clicks++;
     const totalClicks = Number(localStorage.getItem("nyap_clicks") || 0) + 1;
     localStorage.setItem("nyap_clicks", totalClicks);
-
     counter.textContent = `Кликов: ${clicks} / 30`;
-    if (clicks >= 30) {
-      window.location.href = "profile.html";
-    }
+    if (clicks >= 30) window.location.href = "profile.html";
   });
 
   if (tg.colorScheme === "dark") {
