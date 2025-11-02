@@ -13,14 +13,11 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-start;
+      justify-content: center;
       background: white;
       transition: background 0.3s, color 0.3s;
       color: #222;
-    }
-    h1 {
-      margin-top: 30px;
-      font-size: 1.8em;
+      text-align: center;
     }
     #penguin {
       width: 160px;
@@ -28,7 +25,7 @@
       cursor: pointer;
       transition: transform 0.1s ease;
       user-select: none;
-      margin-top: 40px;
+      margin-top: 20px;
     }
     #penguin:active {
       transform: scale(0.95);
@@ -38,50 +35,69 @@
       color: #999;
       font-size: 0.9em;
     }
+    #qr-container {
+      margin-top: 20px;
+    }
+    #qr-container img {
+      width: 150px;
+      height: 150px;
+    }
   </style>
 </head>
 <body>
-  <h1 id="greet">Привет!</h1>
-  <img id="penguin" src="https://img.cryptorank.io/coins/pudgy_penguins1734444110427.png" alt="Пингвин">
-  <div id="counter">Кликов: 0 / 30</div>
+
+  <div id="content"></div>
 
   <script>
-    const tg = window.Telegram.WebApp;
-    tg.expand();
+    const content = document.getElementById("content");
 
-    const user = tg.initDataUnsafe?.user;
-    const greet = document.getElementById("greet");
-    const counter = document.getElementById("counter");
-    const penguin = document.getElementById("penguin");
+    // Проверяем, открыто ли в Telegram WebApp
+    const isTelegram = !!window.Telegram?.WebApp;
 
-    // Приветствие
-    if (user?.first_name) {
-      greet.textContent = `Привет, ${user.first_name}!`;
+    if (!isTelegram) {
+      // Если не через Telegram
+      content.innerHTML = `
+        <h1>Авторизуйтесь с помощью Telegram</h1>
+        <p>Сканируйте QR-код и откройте бота @nyapclub_bot</p>
+        <div id="qr-container">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://t.me/nyapclub_bot" alt="QR-код">
+        </div>
+      `;
     } else {
-      greet.textContent = "Привет, незнакомец!";
-    }
+      // Если через Telegram WebApp
+      const tg = window.Telegram.WebApp;
+      tg.expand();
 
-    // Текущая сессия начинается с 0
-    let clicks = 0;
-    counter.textContent = `Кликов: ${clicks} / 30`;
+      const user = tg.initDataUnsafe?.user;
+      content.innerHTML = `
+        <h1>Привет, ${user?.first_name || "Незнакомец"}!</h1>
+        <img id="penguin" src="https://img.cryptorank.io/coins/pudgy_penguins1734444110427.png" alt="Пингвин">
+        <div id="counter">Кликов: 0 / 30</div>
+      `;
 
-    // Обработчик клика по пингвину
-    penguin.addEventListener("click", () => {
-      clicks++;
-      // Сохраняем суммарное значение для профиля
-      const totalClicks = Number(localStorage.getItem("nyap_clicks") || 0) + 1;
-      localStorage.setItem("nyap_clicks", totalClicks);
+      const penguin = document.getElementById("penguin");
+      const counter = document.getElementById("counter");
 
+      // Локальный счётчик для текущей сессии
+      let clicks = 0;
       counter.textContent = `Кликов: ${clicks} / 30`;
-      if (clicks >= 30) {
-        window.location.href = "profile.html";
-      }
-    });
 
-    // Поддержка тёмной темы
-    if (tg.colorScheme === "dark") {
-      document.body.style.background = "#0f0f0f";
-      document.body.style.color = "#f0f0f0";
+      penguin.addEventListener("click", () => {
+        clicks++;
+        // Сохраняем суммарное значение для профиля
+        const totalClicks = Number(localStorage.getItem("nyap_clicks") || 0) + 1;
+        localStorage.setItem("nyap_clicks", totalClicks);
+
+        counter.textContent = `Кликов: ${clicks} / 30`;
+        if (clicks >= 30) {
+          window.location.href = "profile.html";
+        }
+      });
+
+      if (tg.colorScheme === "dark") {
+        document.body.style.background = "#0f0f0f";
+        document.body.style.color = "#f0f0f0";
+      }
     }
   </script>
 </body>
