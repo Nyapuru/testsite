@@ -13,9 +13,26 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      text-align: center;
+      transition: background 0.3s, color 0.3s;
       background: white;
       color: #222;
-      text-align: center;
+    }
+    #penguin {
+      width: 160px;
+      height: 160px;
+      cursor: pointer;
+      transition: transform 0.1s ease;
+      user-select: none;
+      margin-top: 20px;
+    }
+    #penguin:active {
+      transform: scale(0.95);
+    }
+    #counter {
+      margin-top: 10px;
+      color: #999;
+      font-size: 0.9em;
     }
     #qr-container img {
       width: 150px;
@@ -25,11 +42,71 @@
   </style>
 </head>
 <body>
-  <h1>Авторизуйтесь с помощью Telegram</h1>
-  <p>Сканируйте QR-код и откройте бота @nyapclub_bot</p>
-  <div id="qr-container">
-    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://t.me/nyapclub_bot" alt="QR-код">
-  </div>
-  <p>Для Telegram WebApp откройте <a href="telegram.html">ссылку для WebApp</a></p>
+<div id="content"></div>
+
+<script>
+  // Функция для проверки Telegram WebApp
+  function isTelegramWebApp() {
+    try {
+      return typeof window.Telegram !== "undefined" &&
+             typeof window.Telegram.WebApp !== "undefined" &&
+             typeof window.Telegram.WebApp.initData !== "undefined";
+    } catch {
+      return false;
+    }
+  }
+
+  const content = document.getElementById("content");
+
+  if (isTelegramWebApp()) {
+    // Telegram WebApp
+    const script = document.createElement("script");
+    script.src = "https://telegram.org/js/telegram-web-app.js";
+    script.onload = () => {
+      const tg = window.Telegram.WebApp;
+      tg.expand();
+
+      const user = tg.initDataUnsafe?.user;
+
+      content.innerHTML = `
+        <h1>Привет, ${user?.first_name || "Незнакомец"}!</h1>
+        <img id="penguin" src="https://img.cryptorank.io/coins/pudgy_penguins1734444110427.png" alt="Пингвин">
+        <div id="counter">Кликов: 0 / 30</div>
+      `;
+
+      const penguin = document.getElementById("penguin");
+      const counter = document.getElementById("counter");
+
+      let clicks = 0;
+      counter.textContent = `Кликов: ${clicks} / 30`;
+
+      penguin.addEventListener("click", () => {
+        clicks++;
+        const totalClicks = Number(localStorage.getItem("nyap_clicks") || 0) + 1;
+        localStorage.setItem("nyap_clicks", totalClicks);
+
+        counter.textContent = `Кликов: ${clicks} / 30`;
+        if (clicks >= 30) {
+          window.location.href = "profile.html";
+        }
+      });
+
+      if (tg.colorScheme === "dark") {
+        document.body.style.background = "#0f0f0f";
+        document.body.style.color = "#f0f0f0";
+      }
+    };
+    document.body.appendChild(script);
+  } else {
+    // Обычный браузер → QR-код
+    content.innerHTML = `
+      <h1>Авторизуйтесь с помощью Telegram</h1>
+      <p>Сканируйте QR-код и откройте бота @nyapclub_bot</p>
+      <div id="qr-container">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://t.me/nyapclub_bot" alt="QR-код">
+      </div>
+    `;
+  }
+</script>
 </body>
 </html>
