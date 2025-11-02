@@ -8,20 +8,20 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 <style>
-html,body{height:100%;margin:0;font-family:"Inter",sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;background:white;color:#222;padding-top:20px;}
-h1{margin-bottom:10px;}
+html,body{height:100%;margin:0;font-family:"Inter",sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:left;background:white;color:#222;padding-top:20px;}
+h1{margin-bottom:10px;text-align:center;}
 table{border-collapse:collapse;width:90%;max-width:500px;margin-bottom:20px;}
-th,td{border:1px solid #ccc;padding:8px 12px;vertical-align:middle;}
-th{background:#f0f0f0;}
+td{border:1px solid #ccc;padding:8px 12px;vertical-align:middle;}
 tr:nth-child(even){background:#fafafa;}
 tr:nth-child(odd){background:#fff;}
-.avatar{width:32px;height:32px;border-radius:50%;vertical-align:middle;margin-right:8px;}
-button{padding:8px 16px;font-size:1em;cursor:pointer;}
+.avatar{width:32px;height:32px;border-radius:50%;vertical-align:middle;margin-right:8px;display:inline-block;}
+button{padding:8px 16px;font-size:1em;cursor:pointer;align-self:center;}
+td.name-cell{display:flex;align-items:center;}
 </style>
 <body>
 <h1>Топ Будильщиков</h1>
 <table id="rating-table">
-<tr><th>№</th><th>Имя</th><th>Тыки</th></tr>
+<!-- Заголовки убраны -->
 </table>
 <button id="backBtn">Вернуться в профиль</button>
 
@@ -47,15 +47,19 @@ else {
 
   db.collection("users").orderBy("clicks","desc").limit(100)
     .onSnapshot(snapshot => {
-      table.innerHTML = '<tr><th>№</th><th>Имя</th><th>Тыки</th></tr>';
+      table.innerHTML = ""; // Заголовки убраны
       let index = 1;
       snapshot.forEach(doc => {
         const data = doc.data();
-        const avatar = data.photo_url 
+        const tr = document.createElement("tr");
+
+        const avatarImg = data.photo_url 
           ? `<img src="${data.photo_url}" class="avatar">` 
           : `<img src="https://placekitten.com/32/32" class="avatar">`;
-        const tr = document.createElement("tr");
-        tr.innerHTML = `<td>${index}</td><td>${avatar}${data.name}</td><td>${data.clicks}</td>`;
+
+        tr.innerHTML = `
+          <td class="name-cell">${avatarImg}<span>${data.name} — ${data.clicks} Тыки</span></td>
+        `;
         table.appendChild(tr);
         index++;
       });
@@ -64,3 +68,4 @@ else {
 </script>
 </body>
 </html>
+
