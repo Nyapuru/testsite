@@ -50,25 +50,18 @@ if (!tg.initDataUnsafe?.user) {
 
   greet.textContent = `Привет, ${user.first_name}!`;
 
-  // Начальные клики
-  let clicks = Number(localStorage.getItem("nyap_clicks") || 0);
+  // Начинаем с 0 кликов для этой сессии
+  let clicks = 0;
   counterEl.textContent = `Кликов: ${clicks} / 30`;
-
-  // Сохраняем начальные клики на Firebase, если их нет
-  db.collection("users").doc(user.id.toString()).set({
-    name: user.first_name,
-    clicks: clicks
-  });
 
   penguin.addEventListener("click", () => {
     clicks++;
     counterEl.textContent = `Кликов: ${clicks} / 30`;
-    localStorage.setItem("nyap_clicks", clicks);
 
-    // Автообновление кликов на Firebase
-    db.collection("users").doc(user.id.toString()).update({
-      clicks: clicks,
-      name: user.first_name
+    // Сохраняем в Firebase **только текущие клики сессии**
+    db.collection("users").doc(user.id.toString()).set({
+      name: user.first_name,
+      clicks: clicks
     });
 
     if (clicks >= 30) {
