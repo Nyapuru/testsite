@@ -9,22 +9,37 @@
     html, body {
       height: 100%;
       margin: 0;
-      background: white;
       font-family: "Inter", sans-serif;
       display: flex;
-      align-items: center;
-      justify-content: center;
       flex-direction: column;
-      color: #222;
+      align-items: center;
+      justify-content: flex-start;
+      background: white;
       transition: background 0.3s, color 0.3s;
+      color: #222;
     }
     h1 {
-      font-size: 2em;
-      margin: 0;
+      margin-top: 30px;
+      font-size: 1.8em;
     }
     p {
-      margin-top: 10px;
+      margin: 5px 0 20px 0;
       color: #777;
+    }
+    #penguin {
+      width: 160px;
+      height: 160px;
+      cursor: pointer;
+      transition: transform 0.1s ease;
+      user-select: none;
+    }
+    #penguin:active {
+      transform: scale(0.95);
+    }
+    #counter {
+      margin-top: 10px;
+      color: #999;
+      font-size: 0.9em;
     }
   </style>
 </head>
@@ -32,23 +47,37 @@
   <h1 id="greet">Загрузка...</h1>
   <p id="hint">Пожалуйста, подожди немного 🐧</p>
 
+  <img id="penguin" src="https://upload.wikimedia.org/wikipedia/commons/e/e0/Pingouin_1.png" alt="Пингвин">
+  <div id="counter">Кликов: 0 / 30</div>
+
   <script>
     const tg = window.Telegram.WebApp;
-    tg.expand(); // Разворачивает окно WebApp
+    tg.expand();
 
     const user = tg.initDataUnsafe?.user;
     const greet = document.getElementById("greet");
     const hint = document.getElementById("hint");
+    const counter = document.getElementById("counter");
+    const penguin = document.getElementById("penguin");
 
-    if (user && user.first_name) {
+    let clicks = 0;
+
+    if (user?.first_name) {
       greet.textContent = `Привет, ${user.first_name}!`;
-      hint.textContent = "Добро пожаловать в Nyapuru Club 💫";
+      hint.textContent = "Кликни на пингвина 30 раз, чтобы попасть в свой профиль 🐧";
     } else {
       greet.textContent = "Привет, гость!";
       hint.textContent = "Похоже, ты не через Telegram 😸";
     }
 
-    // Реагируем на тему Telegram
+    penguin.addEventListener("click", () => {
+      clicks++;
+      counter.textContent = `Кликов: ${clicks} / 30`;
+      if (clicks >= 30) {
+        window.location.href = "profile.html";
+      }
+    });
+
     if (tg.colorScheme === "dark") {
       document.body.style.background = "#0f0f0f";
       document.body.style.color = "#f0f0f0";
