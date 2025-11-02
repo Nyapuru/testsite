@@ -17,6 +17,7 @@
       background: white;
       color: #222;
       padding-top: 20px;
+      transition: background 0.3s, color 0.3s;
     }
     h1 { margin-bottom: 10px; }
     table {
@@ -34,51 +35,61 @@
   </style>
 </head>
 <body>
-  <h1>Топ-10 Будильщиков</h1>
-  <table id="rating-table">
-    <tr>
-      <th>#</th>
-      <th>Имя</th>
-      <th>Клики</th>
-    </tr>
-  </table>
+<h1>Топ 10 пользователей</h1>
+<table id="rating-table">
+  <tr>
+    <th>#</th>
+    <th>Имя</th>
+    <th>Клики</th>
+  </tr>
+</table>
 
 <script>
-  // Проверка Telegram WebApp
-  function isTelegramWebApp() {
+  const table = document.getElementById("rating-table");
+
+  const script = document.createElement("script");
+  script.src = "https://telegram.org/js/telegram-web-app.js";
+  script.onload = () => {
     try {
-      return typeof window.Telegram !== "undefined" &&
-             typeof window.Telegram.WebApp !== "undefined" &&
-             typeof window.Telegram.WebApp.initData !== "undefined";
-    } catch {
-      return false;
+      const tg = window.Telegram.WebApp;
+      tg.expand();
+
+      // Проверяем, что мы в Telegram WebApp
+      const user = tg.initDataUnsafe?.user;
+      if (!user) {
+        window.location.href = "index.html";
+        return;
+      }
+
+      // Загружаем рейтинг из localStorage
+      let allUsers = [];
+      try {
+        allUsers = JSON.parse(localStorage.getItem("nyap_rating") || "[]");
+        if (!Array.isArray(allUsers)) allUsers = [];
+      } catch (e) { allUsers = []; }
+
+      // Сортируем по убыванию кликов
+      allUsers.sort((a, b) => b.clicks - a.clicks);
+
+      // Выводим топ 10
+      allUsers.slice(0,10).forEach((u, index) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${index + 1}</td><td>${u.name}</td><td>${u.clicks}</td>`;
+        table.appendChild(tr);
+      });
+
+      // Поддержка тёмной темы
+      if (tg.colorScheme === "dark") {
+        document.body.style.background = "#0f0f0f";
+        document.body.style.color = "#f0f0f0";
+      }
+
+    } catch (e) {
+      // Любые ошибки → редирект на index.html
+      window.location.href = "index.html";
     }
-  }
-
-  if (!isTelegramWebApp()) {
-    window.location.href = "index.html";
-  } else {
-    const tg = window.Telegram.WebApp;
-    tg.expand();
-
-    // Получаем всех пользователей и сортируем по убыванию кликов
-    const allUsers = JSON.parse(localStorage.getItem("nyap_rating") || "[]");
-    allUsers.sort((a,b) => b.clicks - a.clicks);
-
-    const table = document.getElementById("rating-table");
-
-    // Выводим топ 10
-    allUsers.slice(0,10).forEach((user, index) => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `<td>${index + 1}</td><td>${user.name}</td><td>${user.clicks}</td>`;
-      table.appendChild(tr);
-    });
-
-    if (tg.colorScheme === "dark") {
-      document.body.style.background = "#0f0f0f";
-      document.body.style.color = "#f0f0f0";
-    }
-  }
+  };
+  document.body.appendChild(script);
 </script>
 </body>
 </html>
