@@ -34,76 +34,47 @@
       color: #999;
       font-size: 0.9em;
     }
-    #qr-container img {
-      width: 150px;
-      height: 150px;
-      margin-top: 10px;
-    }
   </style>
 </head>
 <body>
-<div id="content"></div>
+<div id="content">
+  <h1>Привет!</h1>
+  <img id="penguin" src="https://img.cryptorank.io/coins/pudgy_penguins1734444110427.png" alt="Пингвин">
+  <div id="counter">Кликов: 0 / 30</div>
+</div>
 
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script>
-  window.addEventListener("DOMContentLoaded", () => {
-    const content = document.getElementById("content");
+  const tg = window.Telegram.WebApp;
+  tg.expand();
 
-    // Проверяем Telegram WebApp по наличию initData
-    const isTelegramWebApp = 
-      typeof window.Telegram !== "undefined" &&
-      window.Telegram.WebApp &&
-      typeof window.Telegram.WebApp.initData !== "undefined";
+  const user = tg.initDataUnsafe?.user;
+  const greet = document.querySelector("h1");
+  const penguin = document.getElementById("penguin");
+  const counter = document.getElementById("counter");
 
-    if (!isTelegramWebApp) {
-      // Обычный браузер → QR-код
-      content.innerHTML = `
-        <h1>Авторизуйтесь с помощью Telegram</h1>
-        <p>Сканируйте QR-код и откройте бота @nyapclub_bot</p>
-        <div id="qr-container">
-          <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://t.me/nyapclub_bot" alt="QR-код">
-        </div>
-      `;
-    } else {
-      // Telegram WebApp → подключаем скрипт и интерактив
-      const script = document.createElement("script");
-      script.src = "https://telegram.org/js/telegram-web-app.js";
-      script.onload = () => {
-        const tg = window.Telegram.WebApp;
-        tg.expand();
+  if (user?.first_name) {
+    greet.textContent = `Привет, ${user.first_name}!`;
+  }
 
-        const user = tg.initDataUnsafe?.user;
+  let clicks = 0;
+  counter.textContent = `Кликов: ${clicks} / 30`;
 
-        content.innerHTML = `
-          <h1>Привет, ${user?.first_name || "Незнакомец"}!</h1>
-          <img id="penguin" src="https://img.cryptorank.io/coins/pudgy_penguins1734444110427.png" alt="Пингвин">
-          <div id="counter">Кликов: 0 / 30</div>
-        `;
+  penguin.addEventListener("click", () => {
+    clicks++;
+    const totalClicks = Number(localStorage.getItem("nyap_clicks") || 0) + 1;
+    localStorage.setItem("nyap_clicks", totalClicks);
 
-        const penguin = document.getElementById("penguin");
-        const counter = document.getElementById("counter");
-
-        let clicks = 0;
-        counter.textContent = `Кликов: ${clicks} / 30`;
-
-        penguin.addEventListener("click", () => {
-          clicks++;
-          const totalClicks = Number(localStorage.getItem("nyap_clicks") || 0) + 1;
-          localStorage.setItem("nyap_clicks", totalClicks);
-
-          counter.textContent = `Кликов: ${clicks} / 30`;
-          if (clicks >= 30) {
-            window.location.href = "profile.html";
-          }
-        });
-
-        if (tg.colorScheme === "dark") {
-          document.body.style.background = "#0f0f0f";
-          document.body.style.color = "#f0f0f0";
-        }
-      };
-      document.body.appendChild(script);
+    counter.textContent = `Кликов: ${clicks} / 30`;
+    if (clicks >= 30) {
+      window.location.href = "profile.html";
     }
   });
+
+  if (tg.colorScheme === "dark") {
+    document.body.style.background = "#0f0f0f";
+    document.body.style.color = "#f0f0f0";
+  }
 </script>
 </body>
 </html>
