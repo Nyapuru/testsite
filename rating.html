@@ -1,95 +1,66 @@
 <!doctype html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8">
-  <title>Рейтинг Nyapuru Club</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-      font-family: "Inter", sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      text-align: center;
-      background: white;
-      color: #222;
-      padding-top: 20px;
-      transition: background 0.3s, color 0.3s;
-    }
-    h1 { margin-bottom: 10px; }
-    table {
-      border-collapse: collapse;
-      width: 90%;
-      max-width: 400px;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 8px 12px;
-    }
-    th { background: #f0f0f0; }
-    tr:nth-child(even) { background: #fafafa; }
-    tr:nth-child(odd) { background: #fff; }
-  </style>
-</head>
+<meta charset="utf-8">
+<title>Рейтинг Nyapuru Club</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+<style>
+html, body {height:100%; margin:0; font-family:"Inter",sans-serif; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; text-align:center; background:white; color:#222; padding-top:20px;}
+h1{margin-bottom:10px;}
+table{border-collapse:collapse;width:90%;max-width:400px;}
+th,td{border:1px solid #ccc;padding:8px 12px;}
+th{background:#f0f0f0;}
+tr:nth-child(even){background:#fafafa;}
+tr:nth-child(odd){background:#fff;}
+</style>
 <body>
 <h1>Топ 10 пользователей</h1>
 <table id="rating-table">
-  <tr>
-    <th>#</th>
-    <th>Имя</th>
-    <th>Клики</th>
-  </tr>
+<tr><th>#</th><th>Имя</th><th>Клики</th></tr>
 </table>
 
 <script>
-  const table = document.getElementById("rating-table");
+const firebaseConfig = {
+  apiKey: "AIzaSyAsEXre9p0gcOHFDtjcMUN-meh3T4hU_xE",
+  authDomain: "nyapclub.firebaseapp.com",
+  projectId: "nyapclub",
+  storageBucket: "nyapclub.firebasestorage.app",
+  messagingSenderId: "53370013681",
+  appId: "1:53370013681:web:0f715a2ce01d69db65a650"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-  const script = document.createElement("script");
-  script.src = "https://telegram.org/js/telegram-web-app.js";
-  script.onload = () => {
-    try {
-      const tg = window.Telegram.WebApp;
-      tg.expand();
+const tg = window.Telegram.WebApp;
+tg.expand();
 
-      // Проверяем, что мы в Telegram WebApp
-      const user = tg.initDataUnsafe?.user;
-      if (!user) {
-        window.location.href = "index.html";
-        return;
-      }
+const user = tg.initDataUnsafe?.user;
+if(!user){ window.location.href="index.html"; }
 
-      // Загружаем рейтинг из localStorage
-      let allUsers = [];
-      try {
-        allUsers = JSON.parse(localStorage.getItem("nyap_rating") || "[]");
-        if (!Array.isArray(allUsers)) allUsers = [];
-      } catch (e) { allUsers = []; }
+const table = document.getElementById("rating-table");
 
-      // Сортируем по убыванию кликов
-      allUsers.sort((a, b) => b.clicks - a.clicks);
+db.collection("users")
+  .orderBy("clicks","desc")
+  .limit(10)
+  .get()
+  .then(snapshot=>{
+    let index=1;
+    snapshot.forEach(doc=>{
+      const data = doc.data();
+      const tr=document.createElement("tr");
+      tr.innerHTML=`<td>${index}</td><td>${data.name}</td><td>${data.clicks}</td>`;
+      table.appendChild(tr);
+      index++;
+    });
+  });
 
-      // Выводим топ 10
-      allUsers.slice(0,10).forEach((u, index) => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `<td>${index + 1}</td><td>${u.name}</td><td>${u.clicks}</td>`;
-        table.appendChild(tr);
-      });
-
-      // Поддержка тёмной темы
-      if (tg.colorScheme === "dark") {
-        document.body.style.background = "#0f0f0f";
-        document.body.style.color = "#f0f0f0";
-      }
-
-    } catch (e) {
-      // Любые ошибки → редирект на index.html
-      window.location.href = "index.html";
-    }
-  };
-  document.body.appendChild(script);
+if(tg.colorScheme==="dark"){
+  document.body.style.background="#0f0f0f";
+  document.body.style.color="#f0f0f0";
+}
 </script>
 </body>
 </html>
