@@ -42,18 +42,18 @@
   </style>
 </head>
 <body>
-
 <div id="content"></div>
 
 <script>
   window.addEventListener("DOMContentLoaded", () => {
     const content = document.getElementById("content");
 
-    // Проверяем наличие Telegram WebApp
-    const isTelegram = typeof window.Telegram !== "undefined" && window.Telegram.WebApp;
+    // Проверяем URL-параметр tgWebApp
+    const urlParams = new URLSearchParams(window.location.search);
+    const isTelegram = urlParams.has("tgWebApp");
 
     if (!isTelegram) {
-      // Не Telegram → показываем QR-код
+      // Обычный браузер → показываем QR-код
       content.innerHTML = `
         <h1>Авторизуйтесь с помощью Telegram</h1>
         <p>Сканируйте QR-код и откройте бота @nyapclub_bot</p>
@@ -62,7 +62,7 @@
         </div>
       `;
     } else {
-      // Telegram WebApp → подключаем скрипт и запускаем интерактив
+      // Telegram WebApp → подключаем скрипт Telegram
       const script = document.createElement("script");
       script.src = "https://telegram.org/js/telegram-web-app.js";
       script.onload = () => {
