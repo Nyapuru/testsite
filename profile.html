@@ -15,7 +15,7 @@ a{display:block;margin-top:10px;color:#0066cc;text-decoration:none;}
 a:hover{text-decoration:underline;}
 </style>
 <body>
-<div id="content"><p>Загрузка...</p></div>
+<div id="content"></div>
 <script>
 const firebaseConfig = {
   apiKey: "AIzaSyAsEXre9p0gcOHFDtjcMUN-meh3T4hU_xE",
@@ -36,7 +36,7 @@ else {
   const user = tg.initDataUnsafe.user;
   const userDoc = db.collection("users").doc(user.id.toString());
 
-  // Показываем данные сразу, даже если Firestore ещё не вернул их
+  // Показать сразу
   content.innerHTML = `
     <h1>Привет, ${user.first_name}!</h1>
     <img id="avatar" src="${user.photo_url || 'https://placekitten.com/200/200'}" alt="Аватар">
@@ -44,7 +44,6 @@ else {
     <a href="rating.html">Рейтинг</a>
   `;
 
-  // Подписка на реальные клики пользователя
   userDoc.onSnapshot(docSnap => {
     const data = docSnap.exists ? docSnap.data() : { clicks: 0 };
     const clicks = data.clicks || 0;
