@@ -16,65 +16,20 @@
       background: white;
       color: #222;
       text-align: center;
-      transition: background 0.3s, color 0.3s;
     }
-    #penguin {
-      width: 160px;
-      height: 160px;
-      cursor: pointer;
-      transition: transform 0.1s ease;
-      user-select: none;
-      margin-top: 20px;
-    }
-    #penguin:active {
-      transform: scale(0.95);
-    }
-    #counter {
+    #qr-container img {
+      width: 150px;
+      height: 150px;
       margin-top: 10px;
-      color: #999;
-      font-size: 0.9em;
     }
   </style>
 </head>
 <body>
-<div id="content">
-  <h1>Привет!</h1>
-  <img id="penguin" src="https://img.cryptorank.io/coins/pudgy_penguins1734444110427.png" alt="Пингвин">
-  <div id="counter">Кликов: 0 / 30</div>
-</div>
-
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script>
-  const tg = window.Telegram.WebApp;
-  tg.expand();
-
-  const user = tg.initDataUnsafe?.user;
-  const greet = document.querySelector("h1");
-  const penguin = document.getElementById("penguin");
-  const counter = document.getElementById("counter");
-
-  if (user?.first_name) {
-    greet.textContent = `Привет, ${user.first_name}!`;
-  }
-
-  let clicks = 0;
-  counter.textContent = `Кликов: ${clicks} / 30`;
-
-  penguin.addEventListener("click", () => {
-    clicks++;
-    const totalClicks = Number(localStorage.getItem("nyap_clicks") || 0) + 1;
-    localStorage.setItem("nyap_clicks", totalClicks);
-
-    counter.textContent = `Кликов: ${clicks} / 30`;
-    if (clicks >= 30) {
-      window.location.href = "profile.html";
-    }
-  });
-
-  if (tg.colorScheme === "dark") {
-    document.body.style.background = "#0f0f0f";
-    document.body.style.color = "#f0f0f0";
-  }
-</script>
+  <h1>Авторизуйтесь с помощью Telegram</h1>
+  <p>Сканируйте QR-код и откройте бота @nyapclub_bot</p>
+  <div id="qr-container">
+    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://t.me/nyapclub_bot" alt="QR-код">
+  </div>
+  <p>Для Telegram WebApp откройте <a href="telegram.html">ссылку для WebApp</a></p>
 </body>
 </html>
