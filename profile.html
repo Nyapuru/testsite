@@ -36,16 +36,17 @@ if (!tg.initDataUnsafe?.user) {
   window.location.href = "index.html";
 } else {
   const user = tg.initDataUnsafe.user;
-
-  // Подписка на изменения кликов пользователя в реальном времени
   const userDoc = db.collection("users").doc(user.id.toString());
+
+  // Подписка на изменения документа пользователя
   userDoc.onSnapshot(docSnap => {
-    const data = docSnap.data();
-    const clicks = data?.clicks || 0;
+    const data = docSnap.data() || {};
+    const clicks = data.clicks || 0;
+    const name = data.name || user.first_name;
 
     content.innerHTML = `
-      <h1>Привет, ${user.first_name}!</h1>
-      <img id="avatar" src="${user.photo_url||'https://placekitten.com/200/200'}" alt="Аватар">
+      <h1>Привет, ${name}!</h1>
+      <img id="avatar" src="${user.photo_url || 'https://placekitten.com/200/200'}" alt="Аватар">
       <div id="stats">Ты пытался разбудить Няпа ${clicks} раз!</div>
       <a href="rating.html">Рейтинг</a>
     `;
