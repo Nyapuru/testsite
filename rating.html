@@ -37,16 +37,14 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 const tg = window.Telegram.WebApp;
-if (!tg.initDataUnsafe?.user) {
-  window.location.href = "index.html";
-} else {
+if (!tg.initDataUnsafe?.user) window.location.href = "index.html";
+else {
   const user = tg.initDataUnsafe.user;
   const table = document.getElementById("rating-table");
   const backBtn = document.getElementById("backBtn");
 
   backBtn.addEventListener("click", ()=>{ window.location.href="profile.html"; });
 
-  // Подписка на коллекцию users, сортировка по убыванию кликов, топ 10
   db.collection("users").orderBy("clicks","desc").limit(10)
     .onSnapshot(snapshot => {
       table.innerHTML = '<tr><th>#</th><th>Имя</th><th>Клики</th></tr>';
