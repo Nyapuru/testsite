@@ -53,6 +53,7 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+const FieldValue = firebase.firestore.FieldValue;
 
 const tg = window.Telegram.WebApp;
 
@@ -83,10 +84,12 @@ if (!tg.initDataUnsafe?.user) {
       userDoc.set({
         name: user.first_name,
         clicks: 0,
+        photo_url: user.photo_url || "https://placekitten.com/32/32"
       }).then(initClickHandler);
     } else {
       userDoc.set({
         name: user.first_name,
+        photo_url: user.photo_url || "https://placekitten.com/32/32"
       }, { merge: true }).then(initClickHandler);
     }
   });
@@ -95,22 +98,10 @@ if (!tg.initDataUnsafe?.user) {
     penguin.addEventListener("mousedown", animateClick);
     penguin.addEventListener("touchstart", animateClick);
 
-    penguin.addEventListener("click", async () => {
+    penguin.addEventListener("click", () => {
       clicks++;
-
-      try {
-        // 🔥 Отправляем клик на сервер (Express endpoint /click)
-        await fetch("https://nyapclub-bot.onrender.com/click", { 
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            userId: user.id,
-            userName: user.first_name,
-          })
-        });
-      } catch (err) {
-        console.error("Ошибка при запросе /click:", err);
-      }
+      userDoc.update({ clicks: FieldValue.increment(1) })
+        .catch(err => console.log("Ошибка записи в Firestore:", err));
 
       if (clicks >= 30) {
         window.location.href = "profile.html";
