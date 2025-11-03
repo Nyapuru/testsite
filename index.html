@@ -10,6 +10,7 @@
 <style>
 html, body {
   height: 100%;
+  width: 100%;
   margin: 0;
   font-family: "Inter", sans-serif;
   background: white;
@@ -19,9 +20,10 @@ html, body {
   align-items: center;
   flex-direction: column;
   touch-action: manipulation;
+  overflow: hidden; /* запрещаем прокрутку */
 }
 * { -webkit-tap-highlight-color: transparent; }
-h1 { margin-bottom: 30px; font-size: 1.6em; }
+h1 { margin-bottom: 30px; font-size: 1.6em; text-align: center; }
 #penguin {
   width: 160px;
   height: 160px;
@@ -51,12 +53,16 @@ const db = firebase.firestore();
 const FieldValue = firebase.firestore.FieldValue;
 
 const tg = window.Telegram.WebApp;
+tg.ready();
 
-tg.ready();    // Telegram WebApp полностью инициализирован
-tg.expand();   // Открываем в полный экран
+// Сразу открываем fullscreen
+tg.expand();
 
+// Поддержка на случай изменения ориентации
+window.addEventListener('resize', () => tg.expand());
+
+// Контент для обычного браузера
 if (!tg.initDataUnsafe?.user) {
-  // Пользователь зашел через обычный браузер
   document.body.innerHTML = `
     <h1>Авторизуйтесь через Telegram</h1>
     <p>Сканируйте QR-код для доступа к приложению:</p>
@@ -102,3 +108,4 @@ if (!tg.initDataUnsafe?.user) {
 </script>
 </body>
 </html>
+
