@@ -8,32 +8,33 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 <style>
-html,body{
-  height:100%;
-  margin:0;
-  font-family:"Inter",sans-serif;
-  background:white;
-  color:#222;
-  display:flex;
-  justify-content:center; /* по центру по вертикали */
-  align-items:center;     /* по центру по горизонтали */
-  flex-direction:column;
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: "Inter", sans-serif;
+  background: white;
+  color: #222;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
   touch-action: manipulation;
+  overflow: hidden; /* запрет прокрутки */
 }
-*{-webkit-tap-highlight-color: transparent;}
-h1{
-  margin-bottom:30px;
-  font-size:1.6em;
+* { -webkit-tap-highlight-color: transparent; }
+h1 {
+  margin-bottom: 30px;
+  font-size: 1.6em;
 }
-#penguin{
-  width:160px;
-  height:160px;
-  cursor:pointer;
-  display:block;
+#penguin {
+  width: 160px;
+  height: 160px;
+  cursor: pointer;
+  display: block;
   transition: transform 0.1s ease;
-  user-select:none;
+  user-select: none;
 }
-#penguin:active{
+#penguin:active {
   transform: scale(0.95);
 }
 </style>
@@ -57,6 +58,7 @@ const FieldValue = firebase.firestore.FieldValue;
 
 const tg = window.Telegram.WebApp;
 
+// Проверка авторизации Telegram
 if (!tg.initDataUnsafe?.user) {
   document.body.innerHTML = `
     <h1>Авторизуйтесь через Telegram</h1>
@@ -64,7 +66,8 @@ if (!tg.initDataUnsafe?.user) {
     <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://t.me/nyapclub_bot" alt="QR код">
   `;
 } else {
-  tg.expand();
+  tg.expand(); // полный экран
+  tg.MainButton.hide(); // спрятать кнопки Telegram по умолчанию
   const user = tg.initDataUnsafe.user;
   const greet = document.getElementById("greet");
   const penguin = document.getElementById("penguin");
