@@ -9,28 +9,33 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 <style>
 html, body {
-  height:100%;
-  margin:0;
-  font-family:"Inter",sans-serif;
-  background:white;
-  color:#222;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  flex-direction:column;
+  height: 100%;
+  margin: 0;
+  font-family: "Inter", sans-serif;
+  background: white;
+  color: #222;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* по вертикали */
+  align-items: center;     /* по горизонтали */
   touch-action: manipulation;
 }
-*{-webkit-tap-highlight-color: transparent;}
-h1 { margin-bottom:30px; font-size:1.6em; }
-#penguin {
-  width:160px;
-  height:160px;
-  cursor:pointer;
-  display:block;
-  transition: transform 0.1s ease;
-  user-select:none;
+* { -webkit-tap-highlight-color: transparent; }
+h1 {
+  margin-bottom: 30px;
+  font-size: 1.6em;
 }
-.pressed { transform: scale(0.95); }
+#penguin {
+  width: 160px;
+  height: 160px;
+  cursor: pointer;
+  display: block;
+  transition: transform 0.1s ease;
+  user-select: none;
+}
+#penguin:active {
+  transform: scale(0.95);
+}
 </style>
 </head>
 <body>
@@ -51,7 +56,7 @@ const db = firebase.firestore();
 const FieldValue = firebase.firestore.FieldValue;
 
 const tg = window.Telegram.WebApp;
-tg.expand();
+tg.requestFullscreen(); // открываем приложение в полный экран
 
 if (!tg.initDataUnsafe?.user) {
   document.body.innerHTML = `
@@ -85,24 +90,28 @@ if (!tg.initDataUnsafe?.user) {
   });
 
   function initClickHandler() {
-    // Универсальный обработчик для ПК и мобильных
-    const handleClick = () => {
+    let clickRegistered = false;
+
+    const registerClick = () => {
+      if (clickRegistered) return;
+      clickRegistered = true;
+
       clicks++;
       userDoc.update({ clicks: FieldValue.increment(1) })
         .catch(err => console.log("Ошибка записи в Firestore:", err));
+
       if (clicks >= 30) {
         window.location.href = "profile.html";
       }
+
+      setTimeout(() => clickRegistered = false, 50);
     };
 
-    penguin.addEventListener("mousedown", () => penguin.classList.add("pressed"));
-    penguin.addEventListener("mouseup", () => penguin.classList.remove("pressed"));
-    penguin.addEventListener("mouseleave", () => penguin.classList.remove("pressed"));
-    penguin.addEventListener("touchstart", () => penguin.classList.add("pressed"));
-    penguin.addEventListener("touchend", () => penguin.classList.remove("pressed"));
-
-    penguin.addEventListener("click", handleClick);
-    penguin.addEventListener("touchend", handleClick);
+    penguin.addEventListener("click", registerClick);
+    penguin.addEventListener("touchend", e => {
+      e.preventDefault();
+      registerClick();
+    });
   }
 }
 </script>
