@@ -2,41 +2,64 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<title>Рейтинг Nyapuru Club</title>
+<title>Рейтинг</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 <style>
-html,body{
-  height:100%;
-  margin:0;
-  font-family:"Inter",sans-serif;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:flex-start;
-  background:white;
-  color:#222;
-  padding-top:20px;
-  touch-action: manipulation;
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: "Inter", sans-serif;
+  background: white;
+  color: #222;
 }
-*{-webkit-tap-highlight-color: transparent;}
-h1{text-align:center;margin-bottom:10px;}
-table{border-collapse:collapse;width:90%;max-width:500px;margin-bottom:20px;}
-td{border:1px solid #ccc;padding:8px 12px;vertical-align:middle;}
-tr:nth-child(even){background:#fafafa;}
-tr:nth-child(odd){background:#fff;}
-.avatar{width:32px;height:32px;border-radius:50%;display:block;}
-td.name-cell{padding-left:8px;}
-td.count-cell{text-align:center;}
-button{padding:8px 16px;font-size:1em;cursor:pointer;align-self:center;}
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 20px;
+  padding-top: 200px; /* Отступ сверху */
+  padding-left: 20px;
+}
+h1 {
+  margin: 0;
+  font-size: 1.8em;
+}
+#table {
+  margin-top: 30px;
+  width: 90%;
+  max-width: 600px;
+  border-collapse: collapse;
+}
+#table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #ccc;
+}
+#table td.num {
+  width: 40px;
+  text-align: center;
+}
+#table td.avatar img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
 </style>
+</head>
 <body>
-<h1>Топ Будильщиков</h1>
-<table id="rating-table"></table>
-<button id="backBtn">Вернуться в профиль</button>
-
+<div class="header">
+  <h1>Топ Будильщиков</h1>
+</div>
+<table id="table">
+  <!-- Пример строки -->
+  <tr>
+    <td class="num">1</td>
+    <td class="avatar"><img src="https://placekitten.com/32/32" alt="avatar"></td>
+    <td>Nyapuru</td>
+    <td style="text-align:center;">150</td>
+  </tr>
+</table>
 <script>
 const firebaseConfig = {
   apiKey: "AIzaSyAsEXre9p0gcOHFDtjcMUN-meh3T4hU_xE",
@@ -49,36 +72,24 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-const tg = window.Telegram.WebApp;
-if (!tg.initDataUnsafe?.user) window.location.href = "index.html";
-else {
-  const table = document.getElementById("rating-table");
-  const backBtn = document.getElementById("backBtn");
-
-  backBtn.addEventListener("click", ()=>{ window.location.href="profile.html"; });
-
-  db.collection("users").orderBy("clicks","desc").limit(100)
-    .onSnapshot(snapshot=>{
-      table.innerHTML="";
-      let index=1;
-      snapshot.forEach(doc=>{
-        const data = doc.data();
-        const tr = document.createElement("tr");
-        const avatarImg = data.photo_url 
-          ? `<img src="${data.photo_url}" class="avatar">` 
-          : `<img src="https://placekitten.com/32/32" class="avatar">`;
-
-        tr.innerHTML=`
-          <td>${index}</td>
-          <td>${avatarImg}</td>
-          <td class="name-cell">${data.name}</td>
-          <td class="count-cell">${data.clicks}</td>
-        `;
-        table.appendChild(tr);
-        index++;
-      });
-    });
-}
+// Загрузка рейтинга
+db.collection("users").orderBy("clicks", "desc").limit(100).get().then(snapshot => {
+  const table = document.getElementById("table");
+  table.innerHTML = ""; // очистка таблицы
+  let rank = 1;
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="num">${rank}</td>
+      <td class="avatar"><img src="${data.photo_url || 'https://placekitten.com/32/32'}" alt="avatar"></td>
+      <td>${data.name || 'друг'}</td>
+      <td style="text-align:center;">${data.clicks || 0}</td>
+    `;
+    table.appendChild(tr);
+    rank++;
+  });
+});
 </script>
 </body>
 </html>
