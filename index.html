@@ -33,6 +33,9 @@ h1{
   transition: transform 0.1s ease;
   user-select:none;
 }
+#penguin:active{
+  transform: scale(0.95);
+}
 </style>
 </head>
 <body>
@@ -50,6 +53,7 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+const FieldValue = firebase.firestore.FieldValue;
 
 const tg = window.Telegram.WebApp;
 
@@ -61,9 +65,9 @@ if (!tg.initDataUnsafe?.user) {
     <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://t.me/nyapclub_bot" alt="QR код">
   `;
 } else {
-  // Fullscreen только на мобильных
+  // Запрос Fullscreen только на мобильных
   if (/Mobi|Android/i.test(navigator.userAgent)) {
-    try { tg.requestFullscreen(); } catch(e){ console.log("Fullscreen error:", e); }
+    try { tg.requestFullscreen(); } catch(e) { console.log("Fullscreen error:", e); }
   }
 
   const user = tg.initDataUnsafe.user;
@@ -75,18 +79,18 @@ if (!tg.initDataUnsafe?.user) {
   let clicks = 0;
   const userDoc = db.collection("users").doc(user.id.toString());
 
+  // Проверяем существование документа и создаём при необходимости
   userDoc.get().then(docSnap => {
     if (!docSnap.exists) {
       userDoc.set({
-        id: user.id, // обязательно для правил Firestore
+        id: user.id, // важно для правил Firestore
         name: user.first_name,
         clicks: 0,
         photo_url: user.photo_url || "https://placekitten.com/32/32"
       }).then(initClickHandler);
     } else {
-      clicks = docSnap.data().clicks || 0;
       userDoc.set({
-        id: user.id, // обязательно
+        id: user.id, // обязательно для безопасности
         name: user.first_name,
         photo_url: user.photo_url || "https://placekitten.com/32/32"
       }, { merge: true }).then(initClickHandler);
@@ -100,12 +104,11 @@ if (!tg.initDataUnsafe?.user) {
     penguin.addEventListener("click", () => {
       clicks++;
 
-      // ⚠️ Обновляем clicks и id одновременно, чтобы пройти правило Firestore
+      // Обновляем клики и передаём id для правил
       userDoc.set({
         id: user.id,
-        clicks: clicks
-      }, { merge: true })
-      .catch(err => console.log("Ошибка записи в Firestore:", err));
+        clicks: FieldValue.increment(1)
+      }, { merge: true }).catch(err => console.log("Ошибка записи в Firestore:", err));
 
       if (clicks >= 30) {
         window.location.href = "profile.html";
@@ -121,3 +124,4 @@ if (!tg.initDataUnsafe?.user) {
 </script>
 </body>
 </html>
+
