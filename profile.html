@@ -2,42 +2,46 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<title>Профиль</title>
+<title>Профиль Nyapuru Club</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 <style>
-html, body {
-  margin: 0;
-  padding: 0;
-  font-family: "Inter", sans-serif;
-  background: white;
-  color: #222;
+html,body{
+  height:100%;
+  margin:0;
+  font-family:"Inter",sans-serif;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  background:white;
+  color:#222;
+  touch-action: manipulation;
 }
-.container {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 20px;
-  padding-top: 400px; /* Отступ сверху */
-  padding-left: 20px;
+*{-webkit-tap-highlight-color: transparent;}
+h1{margin-top:20px;text-align:center;}
+img.avatar{
+  width:160px; /* увеличили в 2 раза */
+  height:160px;
+  border-radius:50%;
+  margin-top:20px;
 }
-h1 {
-  margin: 0;
-  font-size: 1.8em;
+#stats{
+  font-size:1em; /* уменьшили текст */
+  margin-top:15px;
+  text-align:center;
 }
-#avatar {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-}
+button{padding:8px 16px;margin-top:20px;font-size:1em;cursor:pointer;}
 </style>
 </head>
 <body>
-<div class="container">
-  <h1>Привет</h1>
-  <img id="avatar" src="https://placekitten.com/80/80" alt="Аватар">
-</div>
+<h1 id="greet">Привет!</h1>
+<img id="avatar" class="avatar" src="https://placekitten.com/160/160" alt="Аватар">
+<h2 id="stats">Ты пытался разбудить Няпа 0 раз!</h2>
+<button id="ratingBtn">Рейтинг</button>
+
 <script>
 const firebaseConfig = {
   apiKey: "AIzaSyAsEXre9p0gcOHFDtjcMUN-meh3T4hU_xE",
@@ -50,15 +54,27 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// Получение данных пользователя
-const userId = localStorage.getItem('user_id'); // пример, как хранить id
-if (userId) {
-  db.collection("users").doc(userId).get().then(doc => {
-    if (doc.exists) {
-      document.getElementById("avatar").src = doc.data().photo_url || "https://placekitten.com/80/80";
-      document.querySelector("h1").textContent = `Привет, ${doc.data().name || 'друг'}!`;
+const tg = window.Telegram.WebApp;
+if (!tg.initDataUnsafe?.user) window.location.href="index.html";
+else {
+  const user = tg.initDataUnsafe.user;
+  const greet = document.getElementById("greet");
+  const avatar = document.getElementById("avatar");
+  const stats = document.getElementById("stats");
+  const ratingBtn = document.getElementById("ratingBtn");
+
+  greet.textContent = `Привет, ${user.first_name}!`;
+  avatar.src = user.photo_url || "https://placekitten.com/160/160";
+
+  const userDoc = db.collection("users").doc(user.id.toString());
+  userDoc.get().then(docSnap=>{
+    if(docSnap.exists){
+      const clicks = docSnap.data().clicks || 0;
+      stats.textContent = `Ты пытался разбудить Няпа ${clicks} раз!`;
     }
   });
+
+  ratingBtn.addEventListener("click", ()=>{ window.location.href="rating.html"; });
 }
 </script>
 </body>
