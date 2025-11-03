@@ -33,9 +33,6 @@ h1{
   transition: transform 0.1s ease;
   user-select:none;
 }
-#penguin:active{
-  transform: scale(0.95);
-}
 </style>
 </head>
 <body>
@@ -65,7 +62,7 @@ if (!tg.initDataUnsafe?.user) {
     <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://t.me/nyapclub_bot" alt="QR код">
   `;
 } else {
-  // Запрос Fullscreen только на мобильных
+  // Fullscreen только на мобильных
   if (/Mobi|Android/i.test(navigator.userAgent)) {
     try { tg.requestFullscreen(); } catch(e) { console.log("Fullscreen error:", e); }
   }
@@ -95,6 +92,11 @@ if (!tg.initDataUnsafe?.user) {
   });
 
   function initClickHandler() {
+    const animateClick = () => {
+      penguin.style.transform = "scale(0.95)";
+      setTimeout(() => penguin.style.transform = "scale(1)", 100);
+    };
+
     penguin.addEventListener("mousedown", animateClick);
     penguin.addEventListener("touchstart", animateClick);
 
@@ -107,11 +109,6 @@ if (!tg.initDataUnsafe?.user) {
         window.location.href = "profile.html";
       }
     });
-  }
-
-  function animateClick() {
-    penguin.style.transform = "scale(0.95)";
-    setTimeout(() => penguin.style.transform = "scale(1)", 100);
   }
 }
 </script>
