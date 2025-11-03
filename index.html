@@ -102,7 +102,7 @@ if (!tg.initDataUnsafe?.user) {
 
       try {
         // 🔥 Отправляем клик на сервер (Express endpoint /click)
-        await fetch("https://nyapclub-bot.onrender.com", { 
+        await fetch("https://nyapclub-bot.onrender.com/click", { 
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
