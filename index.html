@@ -43,7 +43,7 @@ h1{
 <script>
 const tg = window.Telegram.WebApp;
 
-// Если открыли не через Telegram
+// Если сайт открыт не через Telegram
 if (!tg.initDataUnsafe?.user) {
   document.body.innerHTML = `
     <h1>Авторизуйтесь через Telegram</h1>
@@ -64,8 +64,8 @@ if (!tg.initDataUnsafe?.user) {
 
   let clicks = 0;
 
-  function sendClickToServer() {
-    fetch('https://your-server-domain-or-ip:3000/updateClicks', {
+  function sendClick() {
+    fetch('http://localhost:3000/updateClicks', { // <-- URL твоего Node.js сервера
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -73,16 +73,24 @@ if (!tg.initDataUnsafe?.user) {
         name: user.first_name,
         photo_url: user.photo_url || ''
       })
-    }).catch(err => console.log('Ошибка запроса на сервер:', err));
+    })
+    .then(res => res.json())
+    .then(data => console.log('Click sent:', data))
+    .catch(err => console.log('Ошибка отправки клика:', err));
   }
 
-  function handleClick() {
-    clicks++;
-    sendClickToServer();
+  function initClickHandler() {
+    penguin.addEventListener("mousedown", animateClick);
+    penguin.addEventListener("touchstart", animateClick);
 
-    if (clicks >= 30) {
-      window.location.href = "profile.html";
-    }
+    penguin.addEventListener("click", () => {
+      clicks++;
+      sendClick();
+
+      if (clicks >= 30) {
+        window.location.href = "profile.html";
+      }
+    });
   }
 
   function animateClick() {
@@ -90,12 +98,10 @@ if (!tg.initDataUnsafe?.user) {
     setTimeout(() => penguin.style.transform = "scale(1)", 100);
   }
 
-  // Поддержка ПК и мобильных
-  penguin.addEventListener("mousedown", animateClick);
-  penguin.addEventListener("touchstart", animateClick);
-  penguin.addEventListener("click", handleClick);
+  initClickHandler();
 }
 </script>
 </body>
 </html>
+
 
