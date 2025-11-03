@@ -1,3 +1,5 @@
+
+
 <!doctype html>
 <html lang="ru">
 <head>
@@ -54,7 +56,7 @@ const FieldValue = firebase.firestore.FieldValue;
 
 const tg = window.Telegram.WebApp;
 
-// Если сайт открыт не через Telegram
+// Проверяем, открыто ли через Telegram
 if (!tg.initDataUnsafe?.user) {
   document.body.innerHTML = `
     <h1>Авторизуйтесь через Telegram</h1>
@@ -64,6 +66,7 @@ if (!tg.initDataUnsafe?.user) {
 } else {
   // Fullscreen только на мобильных
   if (/Mobi|Android/i.test(navigator.userAgent)) {
+    tg.expand(); // сначала expand
     try { tg.requestFullscreen(); } catch(e) { console.log("Fullscreen error:", e); }
   }
 
@@ -76,6 +79,7 @@ if (!tg.initDataUnsafe?.user) {
   let clicks = 0;
   const userDoc = db.collection("users").doc(user.id.toString());
 
+  // Получаем или создаем документ пользователя
   userDoc.get().then(docSnap => {
     if (!docSnap.exists) {
       userDoc.set({
@@ -84,10 +88,7 @@ if (!tg.initDataUnsafe?.user) {
         photo_url: user.photo_url || "https://placekitten.com/32/32"
       }).then(initClickHandler);
     } else {
-      userDoc.set({
-        name: user.first_name,
-        photo_url: user.photo_url || "https://placekitten.com/32/32"
-      }, { merge: true }).then(initClickHandler);
+      initClickHandler();
     }
   });
 
@@ -114,4 +115,3 @@ if (!tg.initDataUnsafe?.user) {
 </script>
 </body>
 </html>
-
