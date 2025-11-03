@@ -8,32 +8,32 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 <style>
-html, body {
-  height: 100%;
-  margin: 0;
-  font-family: "Inter", sans-serif;
-  background: white;
-  color: #222;
-  display: flex;
-  flex-direction: column;
-  justify-content: center; /* по вертикали */
-  align-items: center;     /* по горизонтали */
+html,body{
+  height:100%;
+  margin:0;
+  font-family:"Inter",sans-serif;
+  background:white;
+  color:#222;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
   touch-action: manipulation;
 }
-* { -webkit-tap-highlight-color: transparent; }
-h1 {
-  margin-bottom: 30px;
-  font-size: 1.6em;
+*{-webkit-tap-highlight-color: transparent;}
+h1{
+  margin-bottom:30px;
+  font-size:1.6em;
 }
-#penguin {
-  width: 160px;
-  height: 160px;
-  cursor: pointer;
-  display: block;
+#penguin{
+  width:160px;
+  height:160px;
+  cursor:pointer;
+  display:block;
   transition: transform 0.1s ease;
-  user-select: none;
+  user-select:none;
 }
-#penguin:active {
+#penguin:active{
   transform: scale(0.95);
 }
 </style>
@@ -56,15 +56,20 @@ const db = firebase.firestore();
 const FieldValue = firebase.firestore.FieldValue;
 
 const tg = window.Telegram.WebApp;
-tg.requestFullscreen(); // открываем приложение в полный экран
 
+// Если сайт открыт не через Telegram
 if (!tg.initDataUnsafe?.user) {
   document.body.innerHTML = `
     <h1>Авторизуйтесь через Telegram</h1>
-    <p>Сканируйте QR-код для доступа к приложению:</p>
+    <p>Сканируйте QR-код, чтобы открыть приложение:</p>
     <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://t.me/nyapclub_bot" alt="QR код">
   `;
 } else {
+  // Запрос Fullscreen только на мобильных
+  if (/Mobi|Android/i.test(navigator.userAgent)) {
+    try { tg.requestFullscreen(); } catch(e) { console.log("Fullscreen error:", e); }
+  }
+
   const user = tg.initDataUnsafe.user;
   const greet = document.getElementById("greet");
   const penguin = document.getElementById("penguin");
@@ -90,12 +95,10 @@ if (!tg.initDataUnsafe?.user) {
   });
 
   function initClickHandler() {
-    let clickRegistered = false;
+    penguin.addEventListener("mousedown", animateClick);
+    penguin.addEventListener("touchstart", animateClick);
 
-    const registerClick = () => {
-      if (clickRegistered) return;
-      clickRegistered = true;
-
+    penguin.addEventListener("click", () => {
       clicks++;
       userDoc.update({ clicks: FieldValue.increment(1) })
         .catch(err => console.log("Ошибка записи в Firestore:", err));
@@ -103,17 +106,15 @@ if (!tg.initDataUnsafe?.user) {
       if (clicks >= 30) {
         window.location.href = "profile.html";
       }
-
-      setTimeout(() => clickRegistered = false, 50);
-    };
-
-    penguin.addEventListener("click", registerClick);
-    penguin.addEventListener("touchend", e => {
-      e.preventDefault();
-      registerClick();
     });
+  }
+
+  function animateClick() {
+    penguin.style.transform = "scale(0.95)";
+    setTimeout(() => penguin.style.transform = "scale(1)", 100);
   }
 }
 </script>
 </body>
 </html>
+
