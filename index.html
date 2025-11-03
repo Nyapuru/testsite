@@ -57,6 +57,7 @@ const FieldValue = firebase.firestore.FieldValue;
 
 const tg = window.Telegram.WebApp;
 
+// Если сайт открыт не через Telegram
 if (!tg.initDataUnsafe?.user) {
   document.body.innerHTML = `
     <h1>Авторизуйтесь через Telegram</h1>
@@ -64,6 +65,7 @@ if (!tg.initDataUnsafe?.user) {
     <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://t.me/nyapclub_bot" alt="QR код">
   `;
 } else {
+  // Запрос Fullscreen только на мобильных
   if (/Mobi|Android/i.test(navigator.userAgent)) {
     try { tg.requestFullscreen(); } catch(e) { console.log("Fullscreen error:", e); }
   }
@@ -71,22 +73,24 @@ if (!tg.initDataUnsafe?.user) {
   const user = tg.initDataUnsafe.user;
   const greet = document.getElementById("greet");
   const penguin = document.getElementById("penguin");
+
   greet.textContent = `Привет, ${user.first_name}!`;
 
   let clicks = 0;
   const userDoc = db.collection("users").doc(user.id.toString());
 
-  // Создаём документ только при первом входе
   userDoc.get().then(docSnap => {
     if (!docSnap.exists) {
       userDoc.set({
-        id: user.id,
         name: user.first_name,
         clicks: 0,
         photo_url: user.photo_url || "https://placekitten.com/32/32"
       }).then(initClickHandler);
     } else {
-      initClickHandler();
+      userDoc.set({
+        name: user.first_name,
+        photo_url: user.photo_url || "https://placekitten.com/32/32"
+      }, { merge: true }).then(initClickHandler);
     }
   });
 
@@ -96,11 +100,8 @@ if (!tg.initDataUnsafe?.user) {
 
     penguin.addEventListener("click", () => {
       clicks++;
-
-      // Просто обновляем clicks через update(), id не трогаем
-      userDoc.update({
-        clicks: FieldValue.increment(1)
-      }).catch(err => console.log("Ошибка записи в Firestore:", err));
+      userDoc.update({ clicks: FieldValue.increment(1) })
+        .catch(err => console.log("Ошибка записи в Firestore:", err));
 
       if (clicks >= 30) {
         window.location.href = "profile.html";
@@ -116,5 +117,4 @@ if (!tg.initDataUnsafe?.user) {
 </script>
 </body>
 </html>
-
 
